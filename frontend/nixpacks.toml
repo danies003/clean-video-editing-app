@@ -1,0 +1,13 @@
+providers = ["node"]
+
+[variables]
+NODE_ENV = "production"
+
+[phases.install]
+cmd = "npm ci"
+
+[phases.build]
+cmd = "ls -la src/lib/ && npm run build"
+
+[start]
+cmd = "npm start" 

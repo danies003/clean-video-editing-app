@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Video Editor</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 60px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        width: 90%;
+      }
+
+      h1 {
+        font-size: 3rem;
+        font-weight: bold;
+        color: white;
+        margin-bottom: 20px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .subtitle {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 30px;
+      }
+
+      .status-card {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+      }
+
+      .status-card p {
+        color: white;
+        margin: 0;
+        font-size: 1.1rem;
+      }
+
+      .btn {
+        display: inline-block;
+        background: linear-gradient(45deg, #4caf50, #45a049);
+        color: white;
+        padding: 15px 30px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: bold;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        margin: 0 10px;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .btn-secondary {
+        background: linear-gradient(45deg, #2196f3, #1976d2);
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 40px;
+      }
+
+      .feature {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .feature h3 {
+        color: white;
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+      }
+
+      .feature p {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+      }
+
+      .upload-area {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px dashed rgba(255, 255, 255, 0.3);
+        border-radius: 15px;
+        padding: 40px;
+        margin: 30px 0;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .upload-area:hover {
+        border-color: rgba(255, 255, 255, 0.6);
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .upload-area p {
+        color: white;
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎬 AI Video Editor</h1>
+      <p class="subtitle">Intelligent Video Editing with AI</p>
+
+      <div class="status-card">
+        <p>✅ Backend Running on Port 8000</p>
+        <p>✅ Frontend Accessible on Port 3000</p>
+      </div>
+
+      <div style="margin: 30px 0">
+        <a href="http://localhost:8000/docs" class="btn">🚀 Test API Now</a>
+        <a href="http://localhost:8000" class="btn btn-secondary"
+          >📊 Backend Health</a
+        >
+      </div>
+
+      <div class="upload-area" onclick="testUpload()">
+        <h3 style="color: white; margin-bottom: 15px">📁 Video Upload</h3>
+        <p>Click to test video upload functionality</p>
+        <p style="font-size: 0.9rem; opacity: 0.8">
+          Supports MP4, MOV, AVI, MKV, WebM
+        </p>
+      </div>
+
+      <div class="features">
+        <div class="feature">
+          <h3>🎵 Beat Detection</h3>
+          <p>AI analyzes audio to find perfect cut points</p>
+        </div>
+        <div class="feature">
+          <h3>🎯 Motion Analysis</h3>
+          <p>Smart detection of action and movement</p>
+        </div>
+        <div class="feature">
+          <h3>✨ Smart Transitions</h3>
+          <p>Intelligent crossfades and effects</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      async function testUpload() {
+        try {
+          const response = await fetch("http://localhost:8000/");
+          if (response.ok) {
+            alert(
+              "✅ Backend is responding! You can test video upload via the API docs."
+            );
+            window.open("http://localhost:8000/docs", "_blank");
+          } else {
+            alert(
+              "❌ Backend not responding. Please make sure it's running on port 8000."
+            );
+          }
+        } catch (error) {
+          alert(
+            "❌ Cannot connect to backend. Please make sure it's running on port 8000."
+          );
+        }
+      }
+
+      // Test backend connection on load
+      window.addEventListener("load", async () => {
+        try {
+          const response = await fetch("http://localhost:8000/");
+          if (response.ok) {
+            console.log("✅ Backend connection successful");
+          } else {
+            console.log("❌ Backend not responding");
+          }
+        } catch (error) {
+          console.log("❌ Backend connection failed:", error);
+        }
+      });
+    </script>
+  </body>
+</html>
