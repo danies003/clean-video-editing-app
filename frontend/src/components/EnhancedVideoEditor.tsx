@@ -304,15 +304,19 @@ export function EnhancedVideoEditor({
     try {
       setEditingState((prev) => ({ ...prev, step: "analysis" }));
 
-      const response = await apiClient.analyzeVideo(
-        uploadedVideo.video_id,
-        uploadedVideo.upload_url
-      );
+      const response = await apiClient.analyzeVideo(uploadedVideo.video_id, {
+        template_type: "beat_match",
+        analysis_options: {
+          edit_style: "tiktok",
+          quality_preset: "high",
+        },
+        video_url: uploadedVideo.upload_url,
+      });
 
-      if (response.job_id) {
+      if (response.job?.job_id) {
         // Create a mock analysis job for now
         const mockAnalysisJob: ProcessingJob = {
-          job_id: response.job_id,
+          job_id: response.job.job_id,
           status: "processing",
           progress: 0,
           created_at: new Date().toISOString(),
@@ -372,7 +376,7 @@ export function EnhancedVideoEditor({
         video_id: uploadedVideo.video_id,
         edit_scale: 0.8,
         style_preferences: {
-          style: editSettings.style_preferences.style,
+          style: editSettings.style_preferences?.style || "tiktok",
           energy_level: "high",
           transition_style: "dynamic",
           pacing: "fast",
@@ -382,10 +386,10 @@ export function EnhancedVideoEditor({
 
       const response = await apiClient.advancedEdit(enhancedEditRequest);
 
-      if (response.job_id) {
+      if (response.job?.job_id) {
         // Create a mock editing job
         const mockEditingJob: ProcessingJob = {
-          job_id: response.job_id,
+          job_id: response.job.job_id,
           status: "processing",
           progress: 0,
           created_at: new Date().toISOString(),
@@ -510,7 +514,7 @@ export function EnhancedVideoEditor({
         video_id: uploadedVideo.video_id,
         edit_scale: 0.8,
         style_preferences: {
-          style: editSettings.style_preferences.style,
+          style: editSettings.style_preferences?.style || "tiktok",
           energy_level: "high",
           transition_style: "dynamic",
           pacing: "fast",
@@ -520,10 +524,10 @@ export function EnhancedVideoEditor({
 
       const response = await apiClient.advancedEdit(renderRequest);
 
-      if (response.job_id) {
+      if (response.job?.job_id) {
         // Create a mock render job
         const mockRenderJob: ProcessingJob = {
-          job_id: response.job_id,
+          job_id: response.job.job_id,
           status: "processing",
           progress: 0,
           created_at: new Date().toISOString(),

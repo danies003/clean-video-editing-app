@@ -139,17 +139,24 @@ export function VideoEditor({ uploadedVideo, onReset }: VideoEditorProps) {
       console.log("🚀 Starting analysis for video:", uploadedVideo.video_id);
       console.log("📤 Upload URL:", uploadedVideo.upload_url);
 
-      const { job_id } = await apiClient.analyzeVideo(
-        uploadedVideo.video_id,
-        uploadedVideo.upload_url
-      );
+      const response = await apiClient.analyzeVideo(uploadedVideo.video_id, {
+        template_type: "beat_match",
+        analysis_options: {
+          edit_style: "tiktok",
+          quality_preset: "high",
+        },
+        video_url: uploadedVideo.upload_url,
+      });
 
-      console.log("✅ Analysis started successfully, job_id:", job_id);
+      console.log(
+        "✅ Analysis started successfully, job_id:",
+        response.job?.job_id
+      );
 
       setEditingState((prev) => ({
         ...prev,
         analysisJob: {
-          job_id,
+          job_id: response.job?.job_id || "unknown",
           status: "pending",
           progress: 0,
           created_at: new Date().toISOString(),
@@ -178,11 +185,11 @@ export function VideoEditor({ uploadedVideo, onReset }: VideoEditorProps) {
   const startEditing = async () => {
     try {
       setEditingState((prev) => ({ ...prev, step: "editing" }));
-      const { job_id } = await apiClient.llmEdit(editSettings);
+      const response = await apiClient.llmEdit(editSettings);
       setEditingState((prev) => ({
         ...prev,
         editingJob: {
-          job_id,
+          job_id: response.job?.job_id || "unknown",
           status: "pending",
           progress: 0,
           created_at: new Date().toISOString(),
@@ -449,11 +456,11 @@ export function VideoEditor({ uploadedVideo, onReset }: VideoEditorProps) {
             </label>
             <div className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg">
               <span className="text-gray-900 font-medium">
-                {editSettings.style_preferences.energy_level === "low" &&
+                {editSettings.style_preferences?.energy_level === "low" &&
                   "Calm & Relaxed"}
-                {editSettings.style_preferences.energy_level === "medium" &&
+                {editSettings.style_preferences?.energy_level === "medium" &&
                   "Balanced"}
-                {editSettings.style_preferences.energy_level === "high" &&
+                {editSettings.style_preferences?.energy_level === "high" &&
                   "High Energy"}
               </span>
               <p className="text-xs text-gray-500 mt-1">
@@ -468,11 +475,11 @@ export function VideoEditor({ uploadedVideo, onReset }: VideoEditorProps) {
             </label>
             <div className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg">
               <span className="text-gray-900 font-medium">
-                {editSettings.style_preferences.transition_style === "smooth" &&
-                  "Smooth Crossfades"}
-                {editSettings.style_preferences.transition_style ===
+                {editSettings.style_preferences?.transition_style ===
+                  "smooth" && "Smooth Crossfades"}
+                {editSettings.style_preferences?.transition_style ===
                   "dynamic" && "Dynamic Cuts"}
-                {editSettings.style_preferences.transition_style ===
+                {editSettings.style_preferences?.transition_style ===
                   "aggressive" && "Aggressive Edits"}
               </span>
               <p className="text-xs text-gray-500 mt-1">AI transition style</p>
