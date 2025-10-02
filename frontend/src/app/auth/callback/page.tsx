@@ -46,7 +46,7 @@ function AuthCallbackContent() {
               body: JSON.stringify({
                 provider: provider,
                 code: code,
-                redirect_uri: `https://localhost:3000/auth/callback`, // Must match the redirect_uri used to obtain the code
+                redirect_uri: `${window.location.origin}/auth/callback`, // Must match the redirect_uri used to obtain the code
               }),
             }
           );

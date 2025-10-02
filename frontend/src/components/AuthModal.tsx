@@ -117,7 +117,7 @@ export default function AuthModal({
       if (!appId) throw new Error("Facebook app id not configured");
 
       const redirectUri = encodeURIComponent(
-        `${apiUrl.replace("8443", "3000")}/auth/callback`
+        `${window.location.origin}/auth/callback`
       );
       const facebookAuthUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${appId}&redirect_uri=${redirectUri}&response_type=code&scope=email,public_profile&state=facebook`;
       window.location.href = facebookAuthUrl;
