@@ -8,12 +8,27 @@ mkdir -p .build-temp
 
 # Copy all files to temp directory
 echo "📁 Copying files to temp directory..."
-cp -r src .build-temp/
+
+# Create the temp directory structure first
+mkdir -p .build-temp/src
+
+# Copy each directory individually to ensure nothing is missed
+cp -r src/app .build-temp/src/
+cp -r src/components .build-temp/src/
+cp -r src/lib .build-temp/src/
+
+# Copy other files
 cp -r public .build-temp/
 cp package*.json .build-temp/
 cp next.config.ts .build-temp/
 cp tsconfig.json .build-temp/
 cp jsconfig.json .build-temp/
+
+# Debug: Check what was copied
+echo "🔍 Checking copied files:"
+ls -la .build-temp/src/
+echo "🔍 Checking if lib directory exists:"
+ls -la .build-temp/src/lib/ || echo "lib directory not found!"
 
 # Replace @ imports with relative imports using Node.js
 echo "🔄 Converting @ imports to relative imports..."
