@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   env: {
     NEXT_PUBLIC_API_URL:
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
+      process.env.NEXT_PUBLIC_API_URL || "https://organic-swim-production.up.railway.app",
   },
   experimental: {
     serverActions: {
@@ -20,12 +20,16 @@ const nextConfig: NextConfig = {
     return config;
   },
   async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: "http://localhost:8000/api/v1/:path*",
-      },
-    ];
+    // Only use rewrites in development
+    if (process.env.NODE_ENV === "development") {
+      return [
+        {
+          source: "/api/:path*",
+          destination: "http://localhost:8000/api/v1/:path*",
+        },
+      ];
+    }
+    return [];
   },
 };
 

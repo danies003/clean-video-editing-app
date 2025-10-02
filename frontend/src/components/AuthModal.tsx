@@ -104,8 +104,7 @@ export default function AuthModal({
     setError(null);
     try {
       // Use dynamic API URL from environment instead of hardcoded localhost:8443
-      const apiUrl =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       const configResp = await fetch(`${apiUrl}/api/v1/auth/config`, {
         mode: "cors",
         headers: {
@@ -115,6 +114,10 @@ export default function AuthModal({
       const config = await configResp.json();
       const appId = config?.facebook?.app_id;
       if (!appId) throw new Error("Facebook app id not configured");
+
+      // Store provider info for callback
+      sessionStorage.setItem("oauth_provider", "facebook");
+      sessionStorage.setItem("oauth_return_url", window.location.pathname);
 
       const redirectUri = encodeURIComponent(
         `${window.location.origin}/auth/callback`
