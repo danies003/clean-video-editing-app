@@ -21,50 +21,49 @@ wheels/
 *.egg
 MANIFEST
 
-# Virtual Environment
+# Virtual environments
 venv/
 env/
 ENV/
 env.bak/
 venv.bak/
 
+# Logs
+*.log
+app.log
+worker.log
+
+# Temporary files
+*.tmp
+*.temp
+*TEMP*
+*.mp3
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
 # OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
-# Logs
-*.log
-logs/
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.build-temp/
 
-# Temporary files
-tmp/
-temp/
-.tmp/
-
-# Video files
-*.mp4
-*.mov
-*.avi
-*.mkv
-*.webm
-
-# Audio files
-*.mp3
-*.wav
-*.aac
-*.m4a
+# Node modules
+node_modules/
+frontend/node_modules/
 
 # Environment variables
 .env
@@ -73,13 +72,5 @@ temp/
 .env.test.local
 .env.production.local
 
-# Redis
-dump.rdb
-
-# S3 uploads
-uploads/
-outputs/
-
-# Test outputs
-9_10/
-testing_video_source/
+# Railway
+.railway/
