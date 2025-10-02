@@ -18,11 +18,28 @@ cp jsconfig.json .build-temp/
 # Replace @ imports with relative imports using Node.js
 echo "🔄 Converting @ imports to relative imports..."
 
-# Use Node.js for reliable text replacement
+# Use Node.js for reliable text replacement (without glob dependency)
 cat > .build-temp/convert_imports.js << 'EOF'
 const fs = require('fs');
 const path = require('path');
-const glob = require('glob');
+
+function findFiles(dir, extensions) {
+    let files = [];
+    const items = fs.readdirSync(dir);
+    
+    for (const item of items) {
+        const fullPath = path.join(dir, item);
+        const stat = fs.statSync(fullPath);
+        
+        if (stat.isDirectory()) {
+            files = files.concat(findFiles(fullPath, extensions));
+        } else if (extensions.some(ext => item.endsWith(ext))) {
+            files.push(fullPath);
+        }
+    }
+    
+    return files;
+}
 
 function convertImports(filePath) {
     let content = fs.readFileSync(filePath, 'utf8');
@@ -78,7 +95,7 @@ function convertImports(filePath) {
 }
 
 // Find and convert all TypeScript/JavaScript files
-const files = glob.sync('src/**/*.{ts,tsx,js,jsx}', { cwd: process.cwd() });
+const files = findFiles('src', ['.ts', '.tsx', '.js', '.jsx']);
 files.forEach(convertImports);
 
 console.log('✅ Import conversion completed!');
@@ -86,6 +103,19 @@ EOF
 
 cd .build-temp
 node convert_imports.js
+
+# Debug: Check file structure after conversion
+echo "🔍 Checking file structure after conversion..."
+echo "Contents of src/ directory:"
+ls -la src/
+echo "Contents of src/lib/ directory:"
+ls -la src/lib/
+echo "Contents of src/components/ directory:"
+ls -la src/components/
+
+# Debug: Check a converted file
+echo "🔍 Checking converted page.tsx:"
+head -10 src/app/page.tsx
 
 # Build with converted imports
 echo "🏗️ Building with converted imports..."
