@@ -22,13 +22,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include the existing auth routes
-try:
-    from app.api.auth import router as auth_router
-    app.include_router(auth_router, prefix="/api/v1/auth", tags=["Authentication"])
-    logger.info("✅ Auth routes loaded successfully")
-except Exception as e:
-    logger.warning(f"⚠️ Could not load auth routes: {e}")
+# Include basic auth routes without video processing dependencies
+@app.get("/api/v1/auth/config")
+async def auth_config():
+    """Get authentication configuration"""
+    return {
+        "google": {
+            "client_id": os.environ.get("GOOGLE_CLIENT_ID"),
+        },
+        "facebook": {
+            "app_id": os.environ.get("FACEBOOK_APP_ID"),
+        }
+    }
+
+@app.post("/api/v1/auth/social")
+async def social_auth():
+    """Handle social authentication"""
+    return {"message": "Social auth endpoint - needs proper implementation"}
 
 @app.get("/")
 async def root():
