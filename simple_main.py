@@ -85,6 +85,11 @@ async def health():
         "version": "1.0.0"
     }
 
+@app.get("/health/simple")
+async def health_simple():
+    logger.info("Simple health check endpoint called")
+    return {"status": "healthy"}
+
 
 if __name__ == "__main__":
     import uvicorn
