@@ -4,7 +4,7 @@
   },
   "deploy": {
     "_comment": "Full backend deployment with all API endpoints",
-    "startCommand": "python main.py",
+    "startCommand": "python main_railway.py",
     "healthcheckPath": "/health/",
     "healthcheckTimeout": 30,
     "restartPolicyType": "ON_FAILURE",
