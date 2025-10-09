@@ -7,7 +7,7 @@ This module orchestrates all components of the video editing pipeline:
 - Module integration and dependency injection
 - Health checks and monitoring endpoints
 
-Deployed: Full backend with all API endpoints - Railway deployment
+Deployed: Full backend with all API endpoints - Railway deployment - FORCE REDEPLOY
 """
 
 import asyncio
@@ -216,9 +216,10 @@ def create_app() -> FastAPI:
         """Root endpoint for basic health check."""
         return {
             "status": "healthy",
-            "message": "Video Editing Automation Engine is running",
+            "message": "Video Editing Automation Engine is running - FULL BACKEND DEPLOYED",
             "version": "1.0.0",
-            "docs": "/docs"
+            "docs": "/docs",
+            "deployed_at": "2024-01-01T00:00:00Z"
         }
     
     # Include API routes
