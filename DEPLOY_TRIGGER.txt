@@ -1,0 +1,4 @@
+Railway Deployment Trigger
+Timestamp: $(date)
+Action: Connect Railway to GitHub repository danies003/clean-video-editing-app
+Status: Ready for deployment
