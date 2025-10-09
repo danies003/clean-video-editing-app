@@ -219,7 +219,8 @@ def create_app() -> FastAPI:
             "message": "Video Editing Automation Engine is running - FULL BACKEND DEPLOYED",
             "version": "1.0.0",
             "docs": "/docs",
-            "deployed_at": "2024-01-01T00:00:00Z"
+            "deployed_at": "2024-01-01T00:00:00Z",
+            "deployment_trigger": "manual_redeploy_$(date +%s)"
         }
     
     # Include API routes
