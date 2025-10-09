@@ -6,10 +6,13 @@ This module orchestrates all components of the video editing pipeline:
 - Background job queue initialization
 - Module integration and dependency injection
 - Health checks and monitoring endpoints
+
+Deployed: Full backend with all API endpoints - Railway deployment
 """
 
 import asyncio
 import logging
+import os
 from contextlib import asynccontextmanager
 from typing import Dict, Any
 
@@ -278,10 +281,13 @@ def main():
     """
     settings = get_settings()
     
+    # Use Railway's PORT environment variable if available
+    port = int(os.environ.get("PORT", settings.port))
+    
     uvicorn.run(
         "main:app",
         host=settings.host,
-        port=settings.port,
+        port=port,
         reload=settings.environment == "development",
         log_level=settings.log_level.lower(),
         access_log=True

@@ -44,6 +44,7 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3001",     # Frontend HTTP (127.0.0.1)
         "https://127.0.0.1:3000",    # Frontend HTTPS (127.0.0.1)
         "https://127.0.0.1:8443",    # Backend HTTPS (127.0.0.1)
+        "https://frontend-clean-production.up.railway.app",  # Railway frontend
     ]
     
     @validator('allowed_origins', pre=True)
