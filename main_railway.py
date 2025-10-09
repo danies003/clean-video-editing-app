@@ -85,45 +85,21 @@ def create_railway_app() -> FastAPI:
     async def health_simple():
         return {"status": "healthy"}
     
-    # Try to include full backend routes with error handling
-    try:
-        logger.info("🔄 Loading full backend routes...")
-        from app.api.routes import health_router, video_router, template_router, multi_video_router
-        from app.api.auth import router as auth_router
-        from app.api.music_routes import router as music_router
-        
-        # Include API routes
-        app.include_router(health_router, prefix="/health", tags=["Health"])
-        app.include_router(video_router, prefix="/api/v1/videos", tags=["Videos"])
-        app.include_router(template_router, prefix="/api/v1/templates", tags=["Templates"])
-        app.include_router(multi_video_router, prefix="/api/v1", tags=["Multi-Video Projects"])
-        app.include_router(auth_router, prefix="/api/v1/auth", tags=["Authentication"])
-        app.include_router(music_router, tags=["Music Library"])
-        
-        logger.info("✅ Full backend routes loaded successfully!")
-        
-    except Exception as e:
-        logger.error(f"❌ Failed to load full backend routes: {e}")
-        logger.info("🔄 Falling back to basic routes...")
-        
-        # Fallback basic routes
-        @app.post("/api/v1/auth/social")
-        async def social_auth_fallback(request_data: dict):
-            return {
-                "access_token": "fallback_token",
-                "user": {
-                    "id": "fallback_user",
-                    "name": "Fallback User",
-                    "email": "fallback@example.com"
-                }
-            }
-        
-        @app.get("/api/v1/auth/config")
-        async def auth_config_fallback():
-            return {
-                "google": {"enabled": True, "client_id": os.environ.get("GOOGLE_CLIENT_ID", "")},
-                "facebook": {"enabled": True, "app_id": os.environ.get("FACEBOOK_APP_ID", "")}
-            }
+    # Load full backend routes - NO FALLBACK
+    logger.info("🔄 Loading full backend routes...")
+    from app.api.routes import health_router, video_router, template_router, multi_video_router
+    from app.api.auth import router as auth_router
+    from app.api.music_routes import router as music_router
+    
+    # Include API routes
+    app.include_router(health_router, prefix="/health", tags=["Health"])
+    app.include_router(video_router, prefix="/api/v1/videos", tags=["Videos"])
+    app.include_router(template_router, prefix="/api/v1/templates", tags=["Templates"])
+    app.include_router(multi_video_router, prefix="/api/v1", tags=["Multi-Video Projects"])
+    app.include_router(auth_router, prefix="/api/v1/auth", tags=["Authentication"])
+    app.include_router(music_router, tags=["Music Library"])
+    
+    logger.info("✅ Full backend routes loaded successfully!")
     
     # Global exception handler
     @app.exception_handler(Exception)
