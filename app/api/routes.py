@@ -1372,10 +1372,24 @@ async def get_video_timeline(
             timeline_data = llm_timeline_data
             logger.info(f"Using LLM-generated timeline with {len(timeline_data['segments'])} segments")
         elif not timeline_data:
-            raise HTTPException(
-                status_code=404,
-                detail="Timeline data not available"
-            )
+            # Return a pending timeline response instead of 404
+            return JSONResponse({
+                "success": True,
+                "video_id": str(video_id),
+                "status": "pending",
+                "message": "Timeline is being generated",
+                "timeline": {
+                    "video_id": str(video_id),
+                    "style": "intelligent",
+                    "target_duration": 0,
+                    "segments": [],
+                    "total_duration": 0
+                },
+                "segments": [],
+                "total_duration": 0,
+                "created_at": job.created_at.isoformat() if hasattr(job, 'created_at') and job.created_at else None,
+                "updated_at": datetime.utcnow().isoformat()
+            })
         
         # Convert UUIDs, datetimes, and Pydantic models to strings for JSON serialization
         def convert_uuids_for_json(obj):
@@ -2484,9 +2498,31 @@ async def get_multi_video_project_timeline(project_id: UUID):
                 "total_duration": len(project.video_ids) * segment_duration
             }
         else:
+            # Return a pending timeline response instead of 404
             return JSONResponse(
-                status_code=404, 
-                content={"error": "Timeline data not available - project may not be completed"},
+                status_code=200,
+                content={
+                    "project_id": str(project_id),
+                    "status": "pending",
+                    "message": "Timeline is being generated",
+                    "timeline": {
+                        "project_id": str(project_id),
+                        "style": "intelligent",
+                        "target_duration": 0,
+                        "segments": [],
+                        "total_duration": 0
+                    },
+                    "segments": [],
+                    "total_duration": 0,
+                    "style": "intelligent",
+                    "segment_ordering": {
+                        "optimal_sequence": [],
+                        "original_video_order": [],
+                        "has_rearrangement": False,
+                        "rearrangement_reasoning": "Timeline generation in progress"
+                    },
+                    "llm_suggestions": []
+                },
                 headers=response_headers
             )
         
