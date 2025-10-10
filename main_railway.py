@@ -89,10 +89,31 @@ def create_railway_app() -> FastAPI:
     logger.info("🔄 Loading full backend routes...")
     
     try:
-        from app.api.routes import health_router, video_router, template_router, multi_video_router
-        from app.api.auth import router as auth_router
-        from app.api.music_routes import router as music_router
+        logger.info("🔄 Step 1: Importing health_router...")
+        from app.api.routes import health_router
+        logger.info("✅ health_router imported successfully")
         
+        logger.info("🔄 Step 2: Importing video_router...")
+        from app.api.routes import video_router
+        logger.info("✅ video_router imported successfully")
+        
+        logger.info("🔄 Step 3: Importing template_router...")
+        from app.api.routes import template_router
+        logger.info("✅ template_router imported successfully")
+        
+        logger.info("🔄 Step 4: Importing multi_video_router...")
+        from app.api.routes import multi_video_router
+        logger.info("✅ multi_video_router imported successfully")
+        
+        logger.info("🔄 Step 5: Importing auth_router...")
+        from app.api.auth import router as auth_router
+        logger.info("✅ auth_router imported successfully")
+        
+        logger.info("🔄 Step 6: Importing music_router...")
+        from app.api.music_routes import router as music_router
+        logger.info("✅ music_router imported successfully")
+        
+        logger.info("🔄 Step 7: Including routers...")
         # Include API routes
         app.include_router(health_router, prefix="/health", tags=["Health"])
         app.include_router(video_router, prefix="/api/v1/videos", tags=["Videos"])
