@@ -24,8 +24,9 @@ except AttributeError:
 from app.models.schemas import VideoTimeline, QualityPreset, VideoFormat
 from app.config.settings import get_settings
 import numpy as np
-import cv2
 import psutil
+
+import cv2
 
 # Font integration imports
 from app.fonts.video_font_renderer import VideoFontRenderer

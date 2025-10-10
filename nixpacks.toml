@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["libGL", "libGLU", "xorg.libXext", "xorg.libXrender", "xorg.libX11", "xorg.libxcb", "libX11", "libXext", "libXrender", "libglvnd", "libgl", "libglu", "mesa", "mesa_glu"]
+
+[phases.install]
+cmds = ["pip install --no-cache-dir -r requirements.txt"]
+
+[phases.build]
+cmds = ["echo 'Build phase completed'"]
+
+[start]
+cmd = "python main_railway.py"
