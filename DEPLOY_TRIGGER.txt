@@ -1,4 +1,5 @@
-Railway Deployment Trigger
-Timestamp: $(date)
-Action: Connect Railway to GitHub repository danies003/clean-video-editing-app
-Status: Ready for deployment
+Railway Deployment Trigger - Thu Oct 10 03:15:00 EDT 2025
+Force deployment with all fixes:
+- google-generativeai>=0.8.0
+- nixpacks.toml with OpenGL libraries
+- All missing dependencies (psutil, aiohttp, librosa, etc.)
