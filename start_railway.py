@@ -53,26 +53,30 @@ def main():
     port = os.environ.get("PORT", "8080")
     logger.info(f"📍 Port: {port}")
     
-    # Start FastAPI server in background
+    # Set environment variables for Railway
+    env = os.environ.copy()
+    env["BYPASS_RENDER"] = "1"
+    
+    # Start FastAPI server in background (same as local)
     logger.info("🔌 Starting FastAPI server...")
     fastapi_process = subprocess.Popen([
         sys.executable, "-m", "uvicorn",
-        "main_railway:app",
+        "main:app",
         "--host", "0.0.0.0",
         "--port", port,
         "--log-level", "info"
-    ])
+    ], env=env)
     processes.append(fastapi_process)
     logger.info(f"✅ FastAPI server started (PID: {fastapi_process.pid})")
     
     # Give FastAPI time to start
     time.sleep(5)
     
-    # Start RQ worker in background
+    # Start RQ worker in background (same as local)
     logger.info("👷 Starting RQ worker...")
     worker_process = subprocess.Popen([
-        sys.executable, "worker_railway.py"
-    ])
+        sys.executable, "run_worker.py"
+    ], env=env)
     processes.append(worker_process)
     logger.info(f"✅ RQ worker started (PID: {worker_process.pid})")
     

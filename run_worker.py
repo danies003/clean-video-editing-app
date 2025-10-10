@@ -15,7 +15,20 @@ from app.editor.renderer import initialize_renderer
 
 # Configure MoviePy to use system FFMPEG
 import os
-os.environ['FFMPEG_BINARY'] = '/opt/homebrew/bin/ffmpeg'
+import shutil
+
+# Try to find ffmpeg in system PATH, fallback to common locations
+ffmpeg_path = shutil.which('ffmpeg')
+if not ffmpeg_path:
+    # Try common macOS location
+    if os.path.exists('/opt/homebrew/bin/ffmpeg'):
+        ffmpeg_path = '/opt/homebrew/bin/ffmpeg'
+    # Try common Linux location
+    elif os.path.exists('/usr/bin/ffmpeg'):
+        ffmpeg_path = '/usr/bin/ffmpeg'
+    
+if ffmpeg_path:
+    os.environ['FFMPEG_BINARY'] = ffmpeg_path
 
 # Configure detailed logging for worker
 logging.basicConfig(
