@@ -1,11 +1,2 @@
 [phases.setup]
-nixPkgs = ["python311", "python311Packages.pip", "libGL", "libGLU", "xorg.libXext", "xorg.libXrender", "xorg.libX11", "xorg.libxcb", "libglvnd", "mesa", "mesa_glu"]
-
-[phases.install]
-cmds = ["python -m pip install --no-cache-dir -r requirements.txt"]
-
-[phases.build]
-cmds = ["echo 'Build phase completed'"]
-
-[start]
-cmd = "python main_railway.py"
+nixPkgs = ["libGL", "libGLU", "xorg.libXext", "xorg.libXrender", "xorg.libX11", "xorg.libxcb", "libglvnd", "mesa", "mesa_glu"]
