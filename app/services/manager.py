@@ -138,33 +138,22 @@ class ServiceManager:
                         
                         settings = get_settings()
                         
-                        # Check if AWS credentials are configured
-                        if settings.aws_access_key_id and settings.aws_secret_access_key:
-                            # Use S3 storage if credentials are available
-                            await initialize_storage_client(
-                                aws_access_key_id=settings.aws_access_key_id,
-                                aws_secret_access_key=settings.aws_secret_access_key,
-                                aws_region=settings.aws_region,
-                                bucket_name=settings.s3_bucket_name
-                            )
-                            self._storage = get_storage_client()
-                            logger.info("✅ S3 storage client initialized")
-                        else:
-                            # Use local storage fallback for development
-                            from app.services.local_storage import LocalStorage
-                            self._storage = LocalStorage()
-                            logger.info("✅ Local storage client initialized (development mode)")
+                        # Initialize S3 storage - require AWS credentials
+                        if not settings.aws_access_key_id or not settings.aws_secret_access_key:
+                            raise Exception("AWS credentials not configured. Please set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables.")
+                        
+                        await initialize_storage_client(
+                            aws_access_key_id=settings.aws_access_key_id,
+                            aws_secret_access_key=settings.aws_secret_access_key,
+                            aws_region=settings.aws_region,
+                            bucket_name=settings.s3_bucket_name
+                        )
+                        self._storage = get_storage_client()
+                        logger.info("✅ S3 storage client initialized")
                             
                     except Exception as e:
                         logger.error(f"❌ Storage unavailable: {e}")
-                        # Try local storage as last resort
-                        try:
-                            from app.services.local_storage import LocalStorage
-                            self._storage = LocalStorage()
-                            logger.info("✅ Local storage client initialized (fallback mode)")
-                        except Exception as fallback_error:
-                            logger.error(f"❌ Local storage fallback also failed: {fallback_error}")
-                            raise Exception(f"Storage connection failed: {e}")
+                        raise Exception(f"Storage connection failed: {e}")
         
         return self._storage
     
