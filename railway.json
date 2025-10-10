@@ -3,8 +3,8 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "_comment": "Full backend deployment with all API endpoints",
-    "startCommand": "python main_railway.py",
+    "_comment": "Full backend + worker deployment",
+    "startCommand": "python start_railway.py",
     "healthcheckPath": "/health/",
     "healthcheckTimeout": 30,
     "restartPolicyType": "ON_FAILURE",
