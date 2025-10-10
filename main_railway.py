@@ -41,7 +41,7 @@ class RailwayCORSMiddleware(BaseHTTPMiddleware):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Simplified lifespan manager for Railway deployment."""
-    logger.info("🚀 Starting Video Editing Automation Engine on Railway...")
+    logger.info("🚀 Starting Video Editing Automation Engine on Railway - DEPLOYMENT v2.1...")
     yield
     logger.info("🛑 Shutting down Video Editing Automation Engine...")
 
