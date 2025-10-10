@@ -3,7 +3,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "_comment": "Full backend + worker deployment",
+    "_comment": "Backend + Worker in single container - FORCE DEPLOY",
     "startCommand": "python start_railway.py",
     "healthcheckPath": "/health/",
     "healthcheckTimeout": 30,
