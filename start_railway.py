@@ -61,26 +61,37 @@ def main():
     logger.info("👷 Starting RQ worker in background...")
     worker_process = subprocess.Popen([
         sys.executable, "run_worker.py"
-    ], env=env)
+    ], env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     processes.append(worker_process)
     logger.info(f"✅ RQ worker started (PID: {worker_process.pid})")
     
+    # Give worker a moment to start
+    time.sleep(2)
+    
+    # Start FastAPI server in foreground (will block)
     logger.info("=" * 60)
-    logger.info("🎉 Worker running in background!")
     logger.info("🔌 Starting FastAPI server in foreground...")
     logger.info(f"   - FastAPI: http://0.0.0.0:{port}")
-    logger.info(f"   - Worker: Processing jobs from Redis (PID: {worker_process.pid})")
+    logger.info(f"   - Worker: Processing jobs (PID: {worker_process.pid})")
     logger.info("=" * 60)
     
-    # Start FastAPI server in foreground (this will block and keep the process running)
-    # Railway's healthcheck will be able to hit this directly
-    os.execvp(sys.executable, [
+    # Start FastAPI server - this will block and keep the container running
+    # Use Popen with wait() instead of execvp to keep the worker alive
+    fastapi_process = subprocess.Popen([
         sys.executable, "-m", "uvicorn",
         "main:app",
         "--host", "0.0.0.0",
         "--port", port,
         "--log-level", "info"
-    ])
+    ], env=env)
+    processes.append(fastapi_process)
+    
+    # Wait for FastAPI to finish (it won't, it runs forever)
+    # This keeps the main process alive and both subprocesses running
+    try:
+        fastapi_process.wait()
+    except KeyboardInterrupt:
+        cleanup_processes()
 
 if __name__ == "__main__":
     main()
