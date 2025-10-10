@@ -57,23 +57,8 @@ def main():
     env = os.environ.copy()
     env["BYPASS_RENDER"] = "1"
     
-    # Start FastAPI server in background (same as local)
-    logger.info("🔌 Starting FastAPI server...")
-    fastapi_process = subprocess.Popen([
-        sys.executable, "-m", "uvicorn",
-        "main:app",
-        "--host", "0.0.0.0",
-        "--port", port,
-        "--log-level", "info"
-    ], env=env)
-    processes.append(fastapi_process)
-    logger.info(f"✅ FastAPI server started (PID: {fastapi_process.pid})")
-    
-    # Give FastAPI time to start
-    time.sleep(5)
-    
-    # Start RQ worker in background (same as local)
-    logger.info("👷 Starting RQ worker...")
+    # Start RQ worker in background first
+    logger.info("👷 Starting RQ worker in background...")
     worker_process = subprocess.Popen([
         sys.executable, "run_worker.py"
     ], env=env)
@@ -81,22 +66,21 @@ def main():
     logger.info(f"✅ RQ worker started (PID: {worker_process.pid})")
     
     logger.info("=" * 60)
-    logger.info("🎉 All services running!")
+    logger.info("🎉 Worker running in background!")
+    logger.info("🔌 Starting FastAPI server in foreground...")
     logger.info(f"   - FastAPI: http://0.0.0.0:{port}")
-    logger.info(f"   - Worker: Processing jobs from Redis")
+    logger.info(f"   - Worker: Processing jobs from Redis (PID: {worker_process.pid})")
     logger.info("=" * 60)
     
-    # Keep the main process alive and monitor child processes
-    try:
-        while True:
-            # Check if processes are still running
-            for i, proc in enumerate(processes):
-                if proc.poll() is not None:
-                    logger.error(f"❌ Process {i} (PID: {proc.pid}) exited with code {proc.returncode}")
-                    cleanup_processes()
-            time.sleep(5)
-    except KeyboardInterrupt:
-        cleanup_processes()
+    # Start FastAPI server in foreground (this will block and keep the process running)
+    # Railway's healthcheck will be able to hit this directly
+    os.execvp(sys.executable, [
+        sys.executable, "-m", "uvicorn",
+        "main:app",
+        "--host", "0.0.0.0",
+        "--port", port,
+        "--log-level", "info"
+    ])
 
 if __name__ == "__main__":
     main()
