@@ -3,7 +3,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "_comment": "Backend + Worker using bash script - HEALTHCHECK FIXED v5.0",
+    "_comment": "Backend + Worker using bash script - DEPLOY LATEST CODE WITH TEMP DIR FIX v6.0",
     "startCommand": "bash start.sh",
     "healthcheckPath": "/health/",
     "healthcheckTimeout": 120,
