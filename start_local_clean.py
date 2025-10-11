@@ -82,16 +82,26 @@ def main():
     env = os.environ.copy()
     env["BYPASS_RENDER"] = "1"
     
+    # Get port from environment (default to 8000 for local)
+    port = os.environ.get("PORT", "8000")
+    print(f"📍 Port: {port}")
+    
     # Start FastAPI server in background process
-    print("🔌 Starting FastAPI server in background...")
-    fastapi_process = subprocess.Popen([
+    # Use --reload for local development (can be disabled via env var)
+    use_reload = os.environ.get("NO_RELOAD", "").lower() != "true"
+    print(f"🔌 Starting FastAPI server {'with reload' if use_reload else 'without reload'}...")
+    
+    uvicorn_cmd = [
         venv_python, "-m", "uvicorn", 
         "main:app",
         "--host", "0.0.0.0",
-        "--port", "8000",
-        "--log-level", "info",
-        "--reload"
-    ], env=env)
+        "--port", port,
+        "--log-level", "info"
+    ]
+    if use_reload:
+        uvicorn_cmd.append("--reload")
+    
+    fastapi_process = subprocess.Popen(uvicorn_cmd, env=env)
     
     # Give FastAPI time to start
     time.sleep(5)
@@ -104,8 +114,8 @@ def main():
     time.sleep(3)
     
     print("✅ All services started!")
-    print("📱 Backend: http://localhost:8000")
-    print("📚 API Docs: http://localhost:8000/docs")
+    print(f"📱 Backend: http://localhost:{port}")
+    print(f"📚 API Docs: http://localhost:{port}/docs")
     print("")
     print("⌨️ Press Ctrl+C to stop all services")
     print("======================================")

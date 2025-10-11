@@ -5,7 +5,8 @@ echo "🚀 Starting Railway Services..."
 echo "================================"
 
 # Get port from environment
-PORT=${PORT:-8080}
+# Railway provides PORT, local defaults to 8000
+PORT=${PORT:-8000}
 echo "📍 Port: $PORT"
 
 # Set environment variables
