@@ -3,7 +3,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "_comment": "Backend + Worker using bash script - DEPLOY v2.1",
+    "_comment": "Backend + Worker using bash script - FORCE DEPLOY v4.0 - HEALTHCHECK FIXED",
     "startCommand": "bash start.sh",
     "healthcheckPath": "/health/simple",
     "healthcheckTimeout": 60,
