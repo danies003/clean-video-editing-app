@@ -1,0 +1,27 @@
+# Virtual environment
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Node modules (if any)
+node_modules/
+
+# Development files
+*.log
+.DS_Store
+.vscode/
+.idea/
+
+# Local development files
+test_*.sh
+*_test.py
+debug_*.py
+
+# Large assets that aren't needed
+*.mp4
+*.mov
+*.avi
+*.mkv
+9_10/
+assets/video/
