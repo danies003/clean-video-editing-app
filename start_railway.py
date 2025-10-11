@@ -59,14 +59,15 @@ def main():
     
     # Start RQ worker in background first
     logger.info("👷 Starting RQ worker in background...")
+    # Don't redirect output - let it log to the same stream
     worker_process = subprocess.Popen([
         sys.executable, "run_worker.py"
-    ], env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    ], env=env)
     processes.append(worker_process)
     logger.info(f"✅ RQ worker started (PID: {worker_process.pid})")
     
-    # Give worker a moment to start
-    time.sleep(2)
+    # Give worker more time to initialize
+    time.sleep(5)
     
     # Start FastAPI server in foreground (will block)
     logger.info("=" * 60)
