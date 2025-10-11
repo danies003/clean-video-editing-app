@@ -25,3 +25,13 @@ debug_*.py
 *.mkv
 9_10/
 assets/video/
+
+# Additional exclusions to reduce deployment size
+*.tmp
+*.temp
+.git/
+.github/
+*.md
+README*
+requirements_full.txt
+simple_*
