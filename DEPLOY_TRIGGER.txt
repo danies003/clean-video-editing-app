@@ -1,8 +1,9 @@
-Deployment trigger - $(date)
+Deployment trigger - FORCE DEPLOY v3.0
 Latest fixes deployed:
 - Worker initialization fix
 - Temp directory creation fix (fixes 20% failure)
 - Port standardization (8000)
 - CORS fix for Railway frontend
 
-Commit: 333f17d
+Commit: a8a1979
+Status: READY FOR TESTING
