@@ -1,0 +1,8 @@
+Deployment trigger - $(date)
+Latest fixes deployed:
+- Worker initialization fix
+- Temp directory creation fix (fixes 20% failure)
+- Port standardization (8000)
+- CORS fix for Railway frontend
+
+Commit: 333f17d
