@@ -66,7 +66,11 @@ async def health_check():
     
     # Simple health check - just return healthy
     return HealthCheckResponse(
+        success=True,
+        message="Operation completed successfully",
+        timestamp=datetime.now().isoformat(),
         status="healthy",
+        version="1.0.0",
         services={"api": "healthy"},
         uptime=time.time() - start_time
     )
@@ -80,7 +84,11 @@ async def health_check_no_slash():
     start_time = getattr(health_check, '_start_time', time.time())
     
     return HealthCheckResponse(
+        success=True,
+        message="Operation completed successfully",
+        timestamp=datetime.now().isoformat(),
         status="healthy",
+        version="1.0.0",
         services={"api": "healthy"},
         uptime=time.time() - start_time
     )
