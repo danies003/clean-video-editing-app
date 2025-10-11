@@ -11,7 +11,6 @@ from app.ingestion.storage import initialize_storage_client
 from app.analyzer.engine import initialize_analysis_engine
 from app.templates.manager import initialize_template_manager
 from app.timeline.builder import initialize_timeline_builder
-from app.editor.renderer import initialize_renderer
 
 # Configure MoviePy to use system FFMPEG
 import os
@@ -88,14 +87,6 @@ def initialize_services():
             logger.info("✅ Timeline builder ready")
         except Exception as e:
             logger.warning(f"⚠️ Timeline builder initialization failed (will be lazy-loaded): {e}")
-
-        # Try to initialize video renderer (optional)
-        try:
-            logger.info("🎬 Initializing video renderer...")
-            asyncio.run(initialize_renderer())
-            logger.info("✅ Video renderer ready")
-        except Exception as e:
-            logger.warning(f"⚠️ Video renderer initialization failed (will be lazy-loaded): {e}")
         
         logger.info("🚀 CORE SERVICES INITIALIZED SUCCESSFULLY")
         return True
