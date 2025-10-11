@@ -651,6 +651,10 @@ class JobQueue:
                     storage = await service_manager.get_storage()
                     
                     video_paths = []
+                    # Ensure temp directory exists
+                    import os
+                    os.makedirs("/tmp/video_editing", exist_ok=True)
+                    
                     for video_id in video_ids:
                         # Download video from S3 to local temp file
                         temp_path = f"/tmp/video_editing/{video_id}_source.mp4"
