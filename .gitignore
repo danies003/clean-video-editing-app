@@ -10,8 +10,9 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
+# Note: Don't ignore lib/ globally as it would exclude frontend/src/lib/
+# Python's lib/ is usually in venv/ which is already ignored
 parts/
 sdist/
 var/
