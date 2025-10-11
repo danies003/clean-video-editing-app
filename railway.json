@@ -3,8 +3,8 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "_comment": "Backend + Worker in single container - FORCE DEPLOY",
-    "startCommand": "python start_railway.py",
+    "_comment": "Backend + Worker using bash script",
+    "startCommand": "bash start.sh",
     "healthcheckPath": "/health/",
     "healthcheckTimeout": 30,
     "restartPolicyType": "ON_FAILURE",
