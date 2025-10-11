@@ -2,12 +2,13 @@ providers = ["node"]
 
 [variables]
 NODE_ENV = "production"
+NEXT_TELEMETRY_DISABLED = "1"
 
 [phases.install]
-cmd = "npm ci"
+cmd = "npm ci --prefer-offline"
 
 [phases.build]
-cmd = "ls -la src/lib/ && npm run build"
+cmd = "npm run build"
 
 [start]
 cmd = "npm start" 

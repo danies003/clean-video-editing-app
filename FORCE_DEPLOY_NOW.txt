@@ -1,0 +1,12 @@
+FORCE DEPLOYMENT - TIMESTAMP: $(date)
+This file exists to force Railway to detect changes and deploy.
+
+All fixes are ready:
+- Healthcheck fixed: /health/simple + 60s timeout
+- Worker initialization fixed
+- Temp directory creation fixed
+- CORS fixed
+- Port standardized to 8000
+
+COMMIT: 58e2d42
+DEPLOY NOW!
