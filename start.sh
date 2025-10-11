@@ -19,7 +19,7 @@ WORKER_PID=$!
 echo "✅ RQ worker started (PID: $WORKER_PID)"
 
 # Give worker time to start
-sleep 5
+sleep 10
 
 # Start FastAPI server in foreground (this will block)
 echo "🔌 Starting FastAPI server on port $PORT..."
