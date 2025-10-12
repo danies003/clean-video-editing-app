@@ -1,0 +1,4 @@
+FORCE BACKEND DEPLOY - Fix backend serving frontend content
+Timestamp: $(date)
+Issue: Backend URL serving Next.js frontend instead of FastAPI
+Status: NEEDS BACKEND REDEPLOY
