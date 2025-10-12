@@ -162,7 +162,7 @@ class OAuthService:
 
             # 2) Fetch user profile using the user access token
             me_url = (
-                "https://graph.facebook.com/v18.0/me"
+                "https://graph.facebook.com/v19.0/me"
                 "?fields=id,name,email,picture"
                 f"&access_token={access_token}"
             )
@@ -203,7 +203,7 @@ class OAuthService:
 
             # 1) Exchange authorization code for a short-lived user access token
             token_url = (
-                "https://graph.facebook.com/v18.0/oauth/access_token"
+                "https://graph.facebook.com/v19.0/oauth/access_token"
             )
             if not self.facebook_app_secret:
                 logger.error("[FB] Cannot exchange code without app secret. Use token flow instead.")
@@ -216,8 +216,8 @@ class OAuthService:
             }
             token_resp = requests.get(token_url, params=token_params, timeout=10)
             if not token_resp.ok:
-                logger.error(f"[FB] code exchange failed: {token_resp.text}")
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Facebook code exchange failed")
+                logger.error(f"[FB] code exchange failed: {token_resp.status_code} - {token_resp.text}")
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Facebook code exchange failed: {token_resp.text}")
 
             token_info = token_resp.json()
             access_token = token_info.get("access_token")
@@ -241,7 +241,7 @@ class OAuthService:
 
             # 3) Fetch profile
             me_resp = requests.get(
-                "https://graph.facebook.com/v18.0/me",
+                "https://graph.facebook.com/v19.0/me",
                 params={"fields": "id,name,email,picture", "access_token": access_token},
                 timeout=10,
             )
