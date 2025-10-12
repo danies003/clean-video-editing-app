@@ -122,7 +122,8 @@ class CustomCORSMiddleware(BaseHTTPMiddleware):
             "http://127.0.0.1:3001",
             "https://127.0.0.1:3000",
             "https://127.0.0.1:8443",
-            "https://frontend-clean-production.up.railway.app"
+            "https://frontend-clean-production.up.railway.app",
+            "https://frontend-production-9e54.up.railway.app"
         ]:
             print(f"🔧 [CORS DEBUG] Adding CORS headers for origin: {origin}")
             response.headers["Access-Control-Allow-Origin"] = origin
