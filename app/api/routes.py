@@ -4262,11 +4262,20 @@ async def download_multi_video_output(
             
             # Stream the file directly to the client
             from fastapi.responses import FileResponse
+            from starlette.background import BackgroundTask
+            
+            def cleanup_temp_file():
+                try:
+                    if os.path.exists(temp_file_path):
+                        os.remove(temp_file_path)
+                except Exception as e:
+                    logger.warning(f"Failed to cleanup temp file: {e}")
+            
             return FileResponse(
                 path=temp_file_path,
                 media_type="video/mp4",
                 filename=f"multi_video_output_{project_id}.mp4",
-                background=lambda: os.remove(temp_file_path) if os.path.exists(temp_file_path) else None
+                background=BackgroundTask(cleanup_temp_file)
             )
             
         except Exception as e:
@@ -4312,11 +4321,20 @@ async def download_multi_video_rendered(
             
             # Stream the file directly to the client
             from fastapi.responses import FileResponse
+            from starlette.background import BackgroundTask
+            
+            def cleanup_temp_file():
+                try:
+                    if os.path.exists(temp_file_path):
+                        os.remove(temp_file_path)
+                except Exception as e:
+                    logger.warning(f"Failed to cleanup temp file: {e}")
+            
             return FileResponse(
                 path=temp_file_path,
                 media_type="video/mp4",
                 filename=f"multi_video_custom_effects_{project_id}.mp4",
-                background=lambda: os.remove(temp_file_path) if os.path.exists(temp_file_path) else None
+                background=BackgroundTask(cleanup_temp_file)
             )
             
         except Exception as e:
