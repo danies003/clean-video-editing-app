@@ -52,7 +52,20 @@ function AuthCallbackContent() {
           );
 
           if (!response.ok) {
-            throw new Error("Authentication failed");
+            const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
+            console.error("Authentication error:", errorData);
+            
+            // Handle specific Facebook OAuth errors
+            if (errorData.detail && errorData.detail.includes("authorization code has been used")) {
+              setStatus("error");
+              setMessage("Authentication already completed. Redirecting...");
+              setTimeout(() => {
+                router.push("/");
+              }, 2000);
+              return;
+            }
+            
+            throw new Error(errorData.detail || "Authentication failed");
           }
           const authData = await response.json();
 
@@ -81,7 +94,7 @@ function AuthCallbackContent() {
         } catch (error) {
           console.error("Authentication error:", error);
           setStatus("error");
-          setMessage("Authentication failed. Please try again.");
+          setMessage(error instanceof Error ? error.message : "Authentication failed. Please try again.");
           setTimeout(() => {
             router.push("/");
           }, 3000);
