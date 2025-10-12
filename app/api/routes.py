@@ -224,7 +224,12 @@ async def environment_diagnostic():
 async def redis_health_check():
     """Check Redis health and detect corruption."""
     try:
-        redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+        # Use REDIS_URL if available (Railway), otherwise fall back to localhost
+        redis_url = os.getenv("REDIS_URL")
+        if redis_url:
+            redis_client = redis.from_url(redis_url, decode_responses=True)
+        else:
+            redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
         validator = RedisValidator(redis_client)
         
         health_status = validator.validate_redis_health()

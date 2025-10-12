@@ -17,12 +17,17 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 class AuthService:
     def __init__(self):
-        self.redis_client = redis.Redis(
-            host=os.getenv("REDIS_HOST", "localhost"),
-            port=int(os.getenv("REDIS_PORT", 6379)),
-            db=0,
-            decode_responses=True
-        )
+        # Use REDIS_URL if available (Railway), otherwise fall back to individual host/port
+        redis_url = os.getenv("REDIS_URL")
+        if redis_url:
+            self.redis_client = redis.from_url(redis_url, decode_responses=True)
+        else:
+            self.redis_client = redis.Redis(
+                host=os.getenv("REDIS_HOST", "localhost"),
+                port=int(os.getenv("REDIS_PORT", 6379)),
+                db=0,
+                decode_responses=True
+            )
     
     def _hash_password(self, password: str) -> str:
         """Hash a password using bcrypt"""
