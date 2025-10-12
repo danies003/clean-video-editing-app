@@ -18,13 +18,18 @@ test_*.sh
 *_test.py
 debug_*.py
 
-# Large assets that aren't needed
+# Large assets that aren't needed (videos)
 *.mp4
 *.mov
 *.avi
 *.mkv
 9_10/
 assets/video/
+
+# Assets now loaded from S3 (reduces deployment size by ~295MB)
+app/assets/music/
+app/assets/fonts/
+app/assets/luts/
 
 # Additional exclusions to reduce deployment size
 *.tmp
