@@ -1789,6 +1789,33 @@ async def analyze_multiple_videos(
         detail="Manual cross-analysis is disabled. The backend automatically triggers cross-analysis when all individual analysis jobs are completed."
     )
 
+@multi_video_router.get("/debug/job/{job_id}")
+async def debug_job_metadata(job_id: str):
+    """Debug endpoint to inspect job metadata from Redis."""
+    try:
+        from app.services import get_service_manager
+        job_queue = await get_service_manager().get_job_queue()
+        
+        from uuid import UUID
+        job = job_queue._load_job_from_redis(UUID(job_id))
+        
+        if not job:
+            return {"error": "Job not found"}
+        
+        return {
+            "job_id": str(job.job_id),
+            "status": job.status,
+            "progress": job.progress,
+            "metadata_keys": list(job.metadata.keys()),
+            "metadata": job.metadata,
+            "video_id": str(job.video_id),
+            "has_timeline": job.timeline is not None,
+            "has_analysis_result": job.analysis_result is not None
+        }
+    except Exception as e:
+        logger.error(f"Debug job failed: {e}")
+        return {"error": str(e)}
+
 @multi_video_router.post("/projects/{project_id}/test-auto-trigger", response_model=Dict[str, Any])
 async def test_auto_trigger_editing_job(project_id: UUID):
     """Test endpoint to manually trigger the auto-triggering of editing jobs."""
