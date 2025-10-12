@@ -12,9 +12,9 @@ echo "📍 Port: $PORT"
 # Set environment variables
 export BYPASS_RENDER=1
 
-# Start RQ worker in background
+# Start RQ worker in background (with output redirected to main stdout/stderr)
 echo "👷 Starting RQ worker in background..."
-python run_worker.py &
+python run_worker.py 2>&1 | sed 's/^/[WORKER] /' &
 WORKER_PID=$!
 echo "✅ RQ worker started (PID: $WORKER_PID)"
 
