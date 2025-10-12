@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_API_URL:
       process.env.NEXT_PUBLIC_API_URL ||
-      "https://organic-swim-production.up.railway.app",
+      "https://backend-production-acb4.up.railway.app",
   },
   experimental: {
     serverActions: {

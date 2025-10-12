@@ -23,7 +23,7 @@ export interface OAuthUser {
 const isDevelopment = process.env.NODE_ENV === "development";
 const baseUrl = isDevelopment
   ? "http://localhost:3000"
-  : "https://your-app.railway.app";
+  : process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') || "https://backend-production-acb4.up.railway.app";
 
 // Google OAuth
 export const initGoogleOAuth = async (): Promise<boolean> => {
