@@ -628,10 +628,14 @@ class JobQueue:
                 
             else:
                 # No timeline available - check if we should use new workflow
-                use_new_workflow = job.metadata.get("custom_settings", {}).get("use_new_workflow", False)
-                workflow_type = job.metadata.get("custom_settings", {}).get("workflow_type", "legacy")
+                # Default to new workflow for multi-video projects (with music integration)
+                use_new_workflow = job.metadata.get("custom_settings", {}).get("use_new_workflow", True)  # Changed default to True
+                workflow_type = job.metadata.get("custom_settings", {}).get("workflow_type", "gemini_direct")  # Changed default to gemini_direct
                 
-                if use_new_workflow and workflow_type == "gemini_direct":
+                # Check if this is a multi-video job
+                is_multi_video = job.metadata.get("job_type") == "multi_video_editing"
+                
+                if is_multi_video and use_new_workflow and workflow_type == "gemini_direct":
                     # Use new integrated multi-video editor
                     logger.info(f"🚀 [NEW WORKFLOW] Using integrated MultiVideoEditor for multi-video editing")
                     
