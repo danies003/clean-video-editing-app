@@ -6,6 +6,7 @@ including video upload, analysis, editing, template management, and health check
 """
 
 import logging
+import os
 from datetime import datetime
 from typing import List, Optional, Dict, Any
 from uuid import UUID, uuid4
