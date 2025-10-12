@@ -1,48 +1,52 @@
+# Core FastAPI dependencies
 fastapi>=0.104.0
-# Railway deployment trigger - Thu Oct 10 03:00:00 EDT 2025 - Force fresh deployment
 uvicorn[standard]>=0.24.0
 python-multipart>=0.0.6
+
+# Database and caching
 redis>=5.0.0
+
+# Cloud storage
 boto3>=1.34.0
+
+# Configuration
 python-dotenv>=1.0.0
 pydantic>=2.5.0
 pydantic[email]>=2.5.0
 pydantic-settings>=2.1.0
 email-validator>=2.0.0
+
+# File handling
 aiofiles>=23.2.0
 httpx>=0.25.0
+
+# Background jobs
 rq>=1.15.0
+
+# Authentication
 PyJWT>=2.8.0
 passlib>=1.7.4
 bcrypt>=4.0.0
+
+# HTTP requests
 requests>=2.31.0
+
+# AI services
 openai>=1.0.0
+
+# OAuth providers
 facebook-sdk>=3.1.0
 google-auth>=2.0.0
 google-auth-oauthlib>=1.0.0
 google-auth-httplib2>=0.1.0
 google-generativeai>=0.8.0
 
-# Video processing dependencies
+# Basic video processing (lightweight)
 numpy>=1.24.0
-opencv-python-headless>=4.8.0
-moviepy>=1.0.3
-librosa>=0.10.0
-ffmpeg-python>=0.2.0
-scipy>=1.11.0
-
-# Additional dependencies for video processing
 Pillow>=10.0.0
-imageio>=2.31.0
-imageio-ffmpeg>=0.4.8
-decorator>=4.4.2
-proglog>=0.1.10
 tqdm>=4.65.0
 psutil>=5.9.0
 aiohttp>=3.8.0
 
-# Video analysis enhancements
-scenedetect>=0.6.2
-torch>=2.0.0
-torchvision>=0.15.0
-transformers>=4.30.0
+# Note: Heavy dependencies like torch, opencv, moviepy removed for Railway deployment
+# These will be installed separately when needed
