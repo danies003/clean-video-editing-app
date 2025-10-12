@@ -559,6 +559,13 @@ class JobQueue:
             
             logger.info(f"[REDIS] Loaded job_id={job_id} from Redis. analysis_result={'set' if job.analysis_result else 'None'}")
             
+            # DEBUG: Log all metadata to see what's available
+            logger.info(f"🔍 [METADATA DEBUG] job.metadata keys: {list(job.metadata.keys())}")
+            logger.info(f"🔍 [METADATA DEBUG] job_type: {job.metadata.get('job_type')}")
+            logger.info(f"🔍 [METADATA DEBUG] project_id: {job.metadata.get('project_id')}")
+            logger.info(f"🔍 [METADATA DEBUG] video_ids: {job.metadata.get('video_ids')}")
+            logger.info(f"🔍 [METADATA DEBUG] custom_settings: {job.metadata.get('custom_settings', {})}")
+            
             # Update job status to processing
             job.status = ProcessingStatus.EDITING
             job.progress = 20
@@ -634,6 +641,9 @@ class JobQueue:
                 
                 # Check if this is a multi-video job
                 is_multi_video = job.metadata.get("job_type") == "multi_video_editing"
+                
+                # DEBUG: Log workflow decision
+                logger.info(f"🔍 [WORKFLOW DECISION] is_multi_video={is_multi_video}, use_new_workflow={use_new_workflow}, workflow_type={workflow_type}")
                 
                 if is_multi_video and use_new_workflow and workflow_type == "gemini_direct":
                     # Use new integrated multi-video editor
