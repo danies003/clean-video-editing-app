@@ -2366,11 +2366,15 @@ async def get_multi_video_project_status(project_id: UUID):
         # Check editing status
         editing_completed = False
         output_video_url = None
+        error_message = None
         if project.editing_job:
             edit_job = job_queue._load_job_from_redis(project.editing_job)
             editing_completed = bool(edit_job and edit_job.status == ProcessingStatus.COMPLETED)
             if editing_completed and edit_job and edit_job.output_url:
                 output_video_url = str(edit_job.output_url)
+            # Get error message if job failed
+            if edit_job and edit_job.status == ProcessingStatus.FAILED:
+                error_message = edit_job.error_message
         
         # Calculate progress
         # For multi-video: analysis (30%) + cross-analysis (30%) + editing (40%)
@@ -2413,7 +2417,7 @@ async def get_multi_video_project_status(project_id: UUID):
             cross_analysis_completed=cross_analysis_completed,
             editing_completed=editing_completed,
             output_video_url=output_video_url,
-            error=None,
+            error=error_message,
             metadata=metadata
         )
         
