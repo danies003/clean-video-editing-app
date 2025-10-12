@@ -162,7 +162,7 @@ class OAuthService:
 
             # 2) Fetch user profile using the user access token
             me_url = (
-                "https://graph.facebook.com/v19.0/me"
+                "https://graph.facebook.com/v22.0/me"
                 "?fields=id,name,email,picture"
                 f"&access_token={access_token}"
             )
@@ -203,7 +203,7 @@ class OAuthService:
 
             # 1) Exchange authorization code for a short-lived user access token
             token_url = (
-                "https://graph.facebook.com/v19.0/oauth/access_token"
+                "https://graph.facebook.com/v22.0/oauth/access_token"
             )
             if not self.facebook_app_secret:
                 logger.error("[FB] Cannot exchange code without app secret. Use token flow instead.")
@@ -241,7 +241,7 @@ class OAuthService:
 
             # 3) Fetch profile
             me_resp = requests.get(
-                "https://graph.facebook.com/v19.0/me",
+                "https://graph.facebook.com/v22.0/me",
                 params={"fields": "id,name,email,picture", "access_token": access_token},
                 timeout=10,
             )

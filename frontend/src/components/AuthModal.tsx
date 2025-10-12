@@ -122,7 +122,7 @@ export default function AuthModal({
       const redirectUri = encodeURIComponent(
         `${window.location.origin}/auth/callback`
       );
-      const facebookAuthUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${appId}&redirect_uri=${redirectUri}&response_type=code&scope=email,public_profile&state=facebook`;
+      const facebookAuthUrl = `https://www.facebook.com/v22.0/dialog/oauth?client_id=${appId}&redirect_uri=${redirectUri}&response_type=code&scope=email,public_profile&state=facebook`;
       window.location.href = facebookAuthUrl;
     } catch (error) {
       console.error("Error initiating Facebook sign-in:", error);
