@@ -1,0 +1,17 @@
+DEPLOY BACKEND TO ORGANIC-SWIM PROJECT
+=====================================
+Status: READY TO DEPLOY
+Project: organic-swim (correct project)
+Service: backend
+Configuration: nixpacks.toml (Python/FastAPI)
+Start Command: bash start.sh
+Dependencies: requirements.txt
+Timestamp: $(date)
+
+FIXES APPLIED:
+- Fixed nixpacks.toml syntax (removed invalid npm, pip packages)
+- Added CORS for frontend URL: https://frontend-production-9e54.up.railway.app
+- Backend should run Python/FastAPI (not Node.js)
+- Worker + FastAPI in single container via start.sh
+
+DEPLOYMENT SHOULD SUCCEED NOW!
