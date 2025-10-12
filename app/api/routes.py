@@ -4228,6 +4228,55 @@ async def download_multi_video_with_custom_effects(
         logger.error(tb)
         raise HTTPException(status_code=500, detail=f"Multi-video custom effects rendering failed: {str(e)}")
 
+@multi_video_router.get("/projects/{project_id}/download")
+async def download_multi_video_output(
+    project_id: UUID,
+    storage_client=Depends(get_storage_client)
+):
+    """
+    Download the completed multi-video output file.
+    This endpoint streams the file directly to avoid all CORS and SSL issues.
+    """
+    try:
+        # Construct the S3 key for the standard multi-video output
+        output_key = f"outputs/multi_video_output_{project_id}.mp4"
+        
+        # Check if the file exists in S3
+        try:
+            storage_client.s3_client.head_object(Bucket=storage_client.bucket_name, Key=output_key)
+        except Exception as e:
+            logger.error(f"❌ Multi-video output not found: {output_key}")
+            raise HTTPException(status_code=404, detail="Multi-video output not found")
+        
+        # Download the file from S3 to a temporary location
+        import tempfile
+        import os
+        temp_file_path = os.path.join(tempfile.gettempdir(), f"download_multi_output_{project_id}.mp4")
+        
+        try:
+            storage_client.s3_client.download_file(
+                storage_client.bucket_name,
+                output_key,
+                temp_file_path
+            )
+            
+            # Stream the file directly to the client
+            from fastapi.responses import FileResponse
+            return FileResponse(
+                path=temp_file_path,
+                media_type="video/mp4",
+                filename=f"multi_video_output_{project_id}.mp4",
+                background=lambda: os.remove(temp_file_path) if os.path.exists(temp_file_path) else None
+            )
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to download multi-video output from S3: {e}")
+            raise HTTPException(status_code=500, detail="Failed to download multi-video output from S3")
+        
+    except Exception as e:
+        logger.error(f"❌ Failed to serve multi-video output: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to serve multi-video output: {str(e)}")
+
 @multi_video_router.get("/projects/{project_id}/download-rendered/{render_job_id}")
 async def download_multi_video_rendered(
     project_id: UUID,
