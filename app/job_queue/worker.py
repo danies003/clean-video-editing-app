@@ -620,12 +620,106 @@ class JobQueue:
                     logger.error(f"❌ [ENHANCED LLM] Failed to convert LLM plan to timeline: {e}")
                     logger.info(f"🔄 [ENHANCED LLM] Falling back to regular timeline processing")
 
-            # Check if this is a multi-video project that needs fresh generation
+            # Check if this is a multi-video project that needs the new workflow with music
+            is_multi_video = job.metadata.get("job_type") == "multi_video_editing"
             multi_video_context = job.metadata.get("multi_video_context")
             force_fresh_generation = multi_video_context is not None
             
+            # For multi-video projects, ALWAYS use the new workflow (with music integration)
+            if is_multi_video:
+                logger.info(f"🚀 [MULTI-VIDEO DETECTED] Using MultiVideoEditor workflow for multi-video project")
+                
+                # Get project information
+                project_id = job.metadata.get("project_id") or job.metadata.get("custom_settings", {}).get("project_id")
+                video_ids = job.metadata.get("video_ids", []) or job.metadata.get("custom_settings", {}).get("video_ids", [])
+                
+                if not project_id or not video_ids:
+                    logger.error(f"❌ [MULTI-VIDEO] Missing project_id or video_ids in metadata")
+                    raise Exception("Project ID or video IDs not available for multi-video workflow")
+                
+                logger.info(f"🎬 [MULTI-VIDEO] project_id={project_id}, video_ids={video_ids}")
+                
+                # Import the integrated multi-video editor
+                from app.editor.multi_video_editor import MultiVideoEditor
+                
+                # Convert video IDs to file paths (download from S3)
+                from app.services import get_service_manager
+                service_manager = get_service_manager()
+                storage = await service_manager.get_storage()
+                
+                video_paths = []
+                # Ensure temp directory exists
+                import os
+                os.makedirs("/tmp/video_editing", exist_ok=True)
+                
+                for video_id in video_ids:
+                    # Download video from S3 to local temp file
+                    temp_path = f"/tmp/video_editing/{video_id}_source.mp4"
+                    try:
+                        await storage.download_file(f"uploads/{video_id}.mp4", temp_path)
+                        video_paths.append(temp_path)
+                        logger.info(f"✅ [MULTI-VIDEO] Downloaded video {video_id} to {temp_path}")
+                    except Exception as e:
+                        logger.error(f"❌ [MULTI-VIDEO] Failed to download video {video_id}: {e}")
+                        raise Exception(f"Failed to download video {video_id}: {e}")
+                
+                # Create multi-video editor and process videos
+                editor = MultiVideoEditor()
+                
+                # Update progress to 30% - starting video processing
+                job.progress = 30
+                job.status = ProcessingStatus.EDITING
+                self._save_job_to_redis(job)
+                logger.info(f"[PROGRESS] Set to 30%: Starting video processing")
+                
+                # Update project status to reflect job progress
+                await self._update_project_status(project_id)
+                
+                output_path = await editor.create_multi_video(video_paths, project_id)
+                
+                # Update progress to 80% - video processing completed
+                job.progress = 80
+                job.status = ProcessingStatus.EDITING
+                self._save_job_to_redis(job)
+                logger.info(f"[PROGRESS] Set to 80%: Video processing completed")
+                
+                # Update project status to reflect job progress
+                await self._update_project_status(project_id)
+                
+                if output_path and os.path.exists(output_path):
+                    logger.info(f"✅ [MULTI-VIDEO] Video created successfully: {output_path}")
+                    
+                    # Upload the result to S3
+                    output_filename = f"multi_video_output_{project_id}.mp4"
+                    output_s3_key = f"outputs/{output_filename}"
+                    
+                    try:
+                        await storage.upload_file(output_path, output_s3_key)
+                        output_url = f"https://my-video-editing-app-2025.s3.amazonaws.com/{output_s3_key}"
+                        logger.info(f"✅ [MULTI-VIDEO] Video uploaded to S3: {output_url}")
+                        
+                        # Update job with success
+                        job.status = ProcessingStatus.COMPLETED
+                        job.progress = 100
+                        job.output_url = output_url
+                        job.error_message = None
+                        self._save_job_to_redis(job)
+                        
+                        # Update project status to reflect completion
+                        await self._update_project_status(project_id)
+                        
+                        logger.info(f"✅ [MULTI-VIDEO] Multi-video editing completed successfully")
+                        return True
+                        
+                    except Exception as e:
+                        logger.error(f"❌ [MULTI-VIDEO] Failed to upload video to S3: {e}")
+                        raise Exception(f"Failed to upload video to S3: {e}")
+                else:
+                    logger.error(f"❌ [MULTI-VIDEO] Video creation failed or output file not found")
+                    raise Exception("Video creation failed")
+            
             # Now check if we have a timeline (either from LLM plan or pre-existing)
-            if job.timeline and job.timeline.segments and not force_fresh_generation:
+            elif job.timeline and job.timeline.segments and not force_fresh_generation:
                 logger.info(f"✅ [ENHANCED TIMELINE] Using timeline with {len(job.timeline.segments)} segments")
                 timeline = job.timeline
                 
