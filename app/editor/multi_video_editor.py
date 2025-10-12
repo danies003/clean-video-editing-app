@@ -735,8 +735,39 @@ class MultiVideoEditor:
                 ]
                 
                 # Select a random audio track (same as backup file)
-                selected_audio = random.choice(music_files)
-                logger.info(f"🎵 [FULL INTELLIGENT] Selected audio: {selected_audio}")
+                selected_audio_path = random.choice(music_files)
+                logger.info(f"🎵 [FULL INTELLIGENT] Selected audio: {selected_audio_path}")
+                
+                # Download music from S3 if running on Railway (music not in local filesystem)
+                selected_audio = selected_audio_path
+                if not Path(selected_audio_path).exists():
+                    logger.info(f"🎵 [FULL INTELLIGENT] Music file not found locally, downloading from S3...")
+                    try:
+                        from app.services import get_service_manager
+                        storage_client = await get_service_manager().get_storage()
+                        
+                        # Create temp directory for music cache
+                        music_cache_dir = Path("/tmp/music_cache")
+                        music_cache_dir.mkdir(exist_ok=True)
+                        
+                        # S3 key is the same as the local path but with 'assets' prefix
+                        s3_key = selected_audio_path.replace("app/assets/", "assets/")
+                        local_music_path = music_cache_dir / Path(selected_audio_path).name
+                        
+                        logger.info(f"🎵 [FULL INTELLIGENT] Downloading from S3: {s3_key}")
+                        
+                        # Download music file from S3
+                        storage_client.s3_client.download_file(
+                            storage_client.bucket_name,
+                            s3_key,
+                            str(local_music_path)
+                        )
+                        
+                        selected_audio = str(local_music_path)
+                        logger.info(f"✅ [FULL INTELLIGENT] Downloaded music to: {selected_audio}")
+                    except Exception as e:
+                        logger.warning(f"⚠️ [FULL INTELLIGENT] Failed to download music from S3: {e}")
+                        logger.info(f"🎵 [FULL INTELLIGENT] Continuing without background music")
                 
                 if Path(selected_audio).exists():
                     logger.info(f"🎵 [FULL INTELLIGENT] Found music file: {selected_audio}")
