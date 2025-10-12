@@ -54,5 +54,8 @@ imageio-ffmpeg>=0.4.8
 decorator>=4.4.2
 proglog>=0.1.10
 
+# Web scraping and parsing
+beautifulsoup4>=4.12.0
+
 # Note: Heavy dependencies like torch, opencv removed for Railway deployment
 # These will be installed separately when needed
