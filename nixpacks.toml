@@ -1,3 +1,13 @@
-[phases.setup]
-aptPkgs = ["libgl1", "libglib2.0-0"]
+providers = ["python", "node"]
 
+[phases.setup]
+nixPkgs = ["python311", "pip", "nodejs_18", "npm"]
+
+[phases.install]
+cmds = ["pip install -r requirements.txt", "npm ci --prefix frontend"]
+
+[phases.build]
+cmds = ["npm run build --prefix frontend"]
+
+[start]
+cmd = "bash start.sh"
