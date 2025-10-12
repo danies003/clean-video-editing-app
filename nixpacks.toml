@@ -1,13 +1,10 @@
-providers = ["python", "node"]
+providers = ["python"]
 
 [phases.setup]
-nixPkgs = ["python311", "pip", "nodejs_18", "npm"]
+nixPkgs = ["python311", "pip"]
 
 [phases.install]
-cmds = ["pip install -r requirements.txt", "npm ci --prefix frontend"]
-
-[phases.build]
-cmds = ["npm run build --prefix frontend"]
+cmds = ["pip install -r requirements.txt"]
 
 [start]
 cmd = "bash start.sh"
