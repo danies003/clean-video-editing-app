@@ -639,9 +639,9 @@ class JobQueue:
                     # Use new integrated multi-video editor
                     logger.info(f"🚀 [NEW WORKFLOW] Using integrated MultiVideoEditor for multi-video editing")
                     
-                    # Get project information
-                    project_id = job.metadata.get("custom_settings", {}).get("project_id")
-                    video_ids = job.metadata.get("custom_settings", {}).get("video_ids", [])
+                    # Get project information - check both custom_settings and direct metadata
+                    project_id = job.metadata.get("project_id") or job.metadata.get("custom_settings", {}).get("project_id")
+                    video_ids = job.metadata.get("video_ids", []) or job.metadata.get("custom_settings", {}).get("video_ids", [])
                     
                     if not project_id or not video_ids:
                         raise Exception("Project ID or video IDs not available for new workflow")
