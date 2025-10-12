@@ -1119,13 +1119,16 @@ class JobQueue:
             return True
             
         except Exception as e:
+            import traceback
+            error_traceback = traceback.format_exc()
             logger.error(f"[EDIT JOB ERROR] Editing failed for job {job_id}: {e}")
+            logger.error(f"[EDIT JOB ERROR] Full traceback:\n{error_traceback}")
             # Try to update job status
             try:
                 job = self._load_job_from_redis(job_id)
                 if job:
                     job.status = ProcessingStatus.FAILED
-                    job.error_message = str(e)
+                    job.error_message = f"{str(e)}\n\nTraceback:\n{error_traceback}"
                     self._save_job_to_redis(job)
             except Exception as inner:
                 logger.error(f"[EDIT JOB ERROR] Could not update job status for {job_id}: {inner}")
