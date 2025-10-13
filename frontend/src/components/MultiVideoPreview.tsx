@@ -365,14 +365,7 @@ export const MultiVideoPreview: React.FC<MultiVideoPreviewProps> = ({
                     controls
                   >
                     <source
-                      src={`${
-                        process.env.NEXT_PUBLIC_API_URL?.replace(
-                          "/api/v1",
-                          ""
-                        ) || "http://localhost:8000"
-                      }/api/v1/multi-video/projects/${
-                        (projectStatus as any).project_id
-                      }/download`}
+                      src={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/multi-video/projects/${projectStatus.project_id}/download`}
                       type="video/mp4"
                     />
                     Your browser does not support the video tag.

@@ -1280,12 +1280,7 @@ export default function Home() {
                     // Handle final proceed action - download the video
                     if (currentProjectId) {
                       // Use the backend download endpoint instead of S3 URL
-                      const downloadUrl = `${
-                        process.env.NEXT_PUBLIC_API_URL?.replace(
-                          "/api/v1",
-                          ""
-                        ) || "http://localhost:8000"
-                      }/api/v1/multi-video/projects/${currentProjectId}/download`;
+                      const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/multi-video/projects/${currentProjectId}/download`;
 
                       const a = document.createElement("a");
                       a.href = downloadUrl;
