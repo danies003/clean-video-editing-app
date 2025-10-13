@@ -338,15 +338,11 @@ class MultiVideoEditor:
             video_path_objects = [Path(path) for path in video_paths]
             logger.info(f"🎬 [INTELLIGENT] Converted to Path objects: {len(video_path_objects)}")
             
-            # Create mock story data for now
-            story_data = {
-                'story_moments': [
-                    {'description': 'Video content', 'caption': 'Amazing content! ✨'},
-                    {'description': 'More content', 'caption': 'So cool! 🎬'}
-                ]
-            }
-            text_overlays = []  # Empty for now
-            logger.info("🎬 [INTELLIGENT] Created mock story data and text overlays")
+            # Use Gemini to analyze videos and generate intelligent story data
+            logger.info("🤖 [GEMINI] Analyzing videos with Gemini AI...")
+            story_data = await self._analyze_videos_with_gemini(video_paths)
+            text_overlays = []  # Will be generated from story data
+            logger.info(f"✅ [GEMINI] Analysis complete: {len(story_data.get('story_moments', []))} story moments found")
             
             logger.info("🎬 [INTELLIGENT] *** CALLING _create_full_intelligent_video ***")
             result = await self._create_full_intelligent_video(
@@ -1084,26 +1080,22 @@ class MultiVideoEditor:
             caption = moment.get('caption_text', moment.get('caption', 'Story moment'))
             all_texts.append(caption)
         
-        # Then add additional texts to fill the remaining segments
-        additional_texts = [
-            "Creating memories that last forever ✨",
-            "Every moment tells a story 📖", 
-            "Living life to the fullest 🌟",
-            "Making every second count ⏰",
-            "Embracing the journey 🚀",
-            "Finding beauty in simplicity 🌸",
-            "Chasing dreams, one frame at a time 🎬",
-            "Celebrating life's adventures 🎉",
-            "Writing our own story 📝",
-            "Capturing the magic of now ✨"
-        ]
-        
         # Calculate number of segments (every 2 seconds)
         num_segments = int(video_duration / 2.0)
         
-        # Fill remaining slots with additional texts
+        # If we don't have enough Gemini captions, repeat the existing ones (cycle through them)
+        # This way we ONLY use AI-generated content, never generic fallbacks
+        if len(all_texts) == 0:
+            logger.warning("⚠️ [TEXT OVERLAY] No Gemini captions available, skipping text overlays")
+            return []
+        
+        # Repeat Gemini captions to fill all segments
         while len(all_texts) < num_segments:
-            all_texts.extend(additional_texts)
+            # Cycle through the existing Gemini captions
+            for caption in all_texts[:len(story_moments)]:
+                if len(all_texts) >= num_segments:
+                    break
+                all_texts.append(caption)
         
         # Create text clips for all segments
         for i in range(num_segments):
