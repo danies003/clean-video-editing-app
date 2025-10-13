@@ -516,12 +516,55 @@ class MultiVideoEditor:
             logger.info(f"🎬 [SIMPLE FALLBACK] Concatenating {len(video_clips)} clips...")
             final_clip = concatenate_videoclips(video_clips)
             
+            # Add background music before writing
+            logger.info(f"🎵 [SIMPLE FALLBACK] Adding background music...")
+            try:
+                import random
+                music_files = [
+                    "app/assets/music/Test/Only me - Patrick Patrikios.mp3",
+                    "app/assets/music/Test/Neon nights - Patrick Patrikios.mp3",
+                    "app/assets/music/Test/Forever ever - Patrick Patrikios.mp3"
+                ]
+                selected_audio_path = random.choice(music_files)
+                
+                # Download from S3 if not local
+                selected_audio = selected_audio_path
+                if not Path(selected_audio_path).exists():
+                    logger.info(f"🎵 [SIMPLE FALLBACK] Downloading music from S3...")
+                    try:
+                        from app.services import get_service_manager
+                        storage_client = await get_service_manager().get_storage()
+                        music_cache_dir = Path("/tmp/music_cache")
+                        music_cache_dir.mkdir(exist_ok=True)
+                        s3_key = selected_audio_path.replace("app/assets/", "assets/")
+                        local_music_path = music_cache_dir / Path(selected_audio_path).name
+                        storage_client.s3_client.download_file(storage_client.bucket_name, s3_key, str(local_music_path))
+                        selected_audio = str(local_music_path)
+                        logger.info(f"✅ [SIMPLE FALLBACK] Downloaded music: {selected_audio}")
+                    except Exception as e:
+                        logger.warning(f"⚠️ [SIMPLE FALLBACK] Failed to download music: {e}")
+                        selected_audio = None
+                
+                # Add music to video if available
+                if selected_audio and Path(selected_audio).exists():
+                    from moviepy.audio.io.AudioFileClip import AudioFileClip
+                    audio_clip = AudioFileClip(selected_audio)
+                    # Loop or trim audio to match video duration
+                    if audio_clip.duration < final_clip.duration:
+                        audio_clip = audio_clip.audio_loop(duration=final_clip.duration)
+                    else:
+                        audio_clip = audio_clip.subclip(0, final_clip.duration)
+                    final_clip = final_clip.set_audio(audio_clip)
+                    logger.info(f"✅ [SIMPLE FALLBACK] Music added to video")
+            except Exception as music_error:
+                logger.warning(f"⚠️ [SIMPLE FALLBACK] Could not add music: {music_error}")
+            
             # Write the final video
             logger.info(f"💾 [SIMPLE FALLBACK] Writing final video to {output_path}...")
             final_clip.write_videofile(
                 str(output_path),
                 codec='libx264',
-                audio=False,  # Disable audio for now to test video
+                audio=True,  # Enable audio to include music
                 fps=30,
                 preset='medium',
                 threads=4
