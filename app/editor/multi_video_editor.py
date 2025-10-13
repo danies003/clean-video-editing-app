@@ -1588,26 +1588,61 @@ class MultiVideoEditor:
     
     def _parse_gemini_response(self, response_text: str, num_videos: int) -> Dict[str, Any]:
         """Parse Gemini response into structured data."""
-        # Simplified parsing - in production, use proper JSON parsing
-        story_moments = []
+        logger.info(f"📝 [GEMINI PARSE] Parsing Gemini response ({len(response_text)} chars)")
+        logger.info(f"📝 [GEMINI PARSE] First 500 chars: {response_text[:500]}")
         
-        # Create basic story moments based on video count
-        for i in range(min(7, num_videos * 2)):  # Max 7 moments
-            story_moments.append({
-                "video_index": i % num_videos,
-                "start_time": 0.0,
-                "duration": 2.0,
-                "caption": f"Dynamic moment {i+1}",
-                "suggested_effects": random.choice([
-                    "slow_motion, color_boost",
-                    "cinematic, unsharp",
-                    "vibrance, glow",
-                    "color_boost, cinematic"
-                ])
-            })
+        story_moments = []
+        story_concept = "A dynamic showcase of video highlights"
+        
+        try:
+            # Try to parse JSON response from Gemini
+            import json
+            import re
+            
+            # Gemini often wraps JSON in markdown code blocks, extract it
+            json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', response_text, re.DOTALL)
+            if json_match:
+                json_str = json_match.group(1)
+                logger.info("📝 [GEMINI PARSE] Found JSON in markdown code block")
+            else:
+                # Try to find raw JSON
+                json_match = re.search(r'\{.*"story_moments".*\}', response_text, re.DOTALL)
+                if json_match:
+                    json_str = json_match.group(0)
+                    logger.info("📝 [GEMINI PARSE] Found raw JSON")
+                else:
+                    raise ValueError("No JSON found in response")
+            
+            # Parse the JSON
+            data = json.loads(json_str)
+            logger.info(f"✅ [GEMINI PARSE] Successfully parsed JSON with {len(data.get('story_moments', []))} moments")
+            
+            # Extract story moments with captions
+            if 'story_moments' in data:
+                story_moments = data['story_moments']
+                logger.info(f"📝 [GEMINI PARSE] Extracted {len(story_moments)} story moments with captions")
+                for i, moment in enumerate(story_moments[:5]):
+                    logger.info(f"📝 [GEMINI PARSE] Moment {i+1} caption: {moment.get('caption', 'N/A')}")
+            
+            if 'story_concept' in data:
+                story_concept = data['story_concept']
+                
+        except Exception as e:
+            logger.warning(f"⚠️ [GEMINI PARSE] Failed to parse JSON: {e}")
+            logger.info("⚠️ [GEMINI PARSE] Falling back to generic captions")
+            
+            # Fallback: create basic story moments
+            for i in range(min(7, num_videos * 2)):
+                story_moments.append({
+                    "video_index": i % num_videos,
+                    "start_time": 0.0,
+                    "duration": 2.0,
+                    "caption": f"Highlight moment from video {i % num_videos + 1}",
+                    "suggested_effects": "color_boost, cinematic"
+                })
         
         return {
-            "story_concept": "A dynamic showcase of video highlights with engaging moments",
+            "story_concept": story_concept,
             "story_moments": story_moments,
             "total_moments": len(story_moments)
         }
