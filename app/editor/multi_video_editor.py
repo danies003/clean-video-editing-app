@@ -420,18 +420,35 @@ class MultiVideoEditor:
                 return video_path
             
             # Use FFmpeg to add music
-            # Get FFmpeg binary path - use shutil.which first (most reliable)
+            # Get FFmpeg binary path - use MoviePy's bundled FFmpeg from imageio-ffmpeg
             import shutil
-            ffmpeg_binary = shutil.which('ffmpeg')
+            ffmpeg_binary = None
+            
+            # First, try to get FFmpeg from imageio_ffmpeg (bundled with MoviePy)
+            try:
+                from imageio_ffmpeg import get_ffmpeg_exe
+                ffmpeg_binary = get_ffmpeg_exe()
+                logger.info(f"🎵 [ENSURE MUSIC] Using imageio-ffmpeg bundled binary: {ffmpeg_binary}")
+            except Exception as e:
+                logger.warning(f"⚠️ [ENSURE MUSIC] Could not get imageio-ffmpeg binary: {e}")
+            
+            # Fallback to system FFmpeg
             if not ffmpeg_binary:
-                # Fallback to common locations
+                ffmpeg_binary = shutil.which('ffmpeg')
+                if ffmpeg_binary:
+                    logger.info(f"🎵 [ENSURE MUSIC] Using system FFmpeg: {ffmpeg_binary}")
+            
+            # Last resort - check common locations
+            if not ffmpeg_binary:
                 for path in ['/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg', '/opt/homebrew/bin/ffmpeg']:
                     if os.path.exists(path):
                         ffmpeg_binary = path
+                        logger.info(f"🎵 [ENSURE MUSIC] Using FFmpeg from: {ffmpeg_binary}")
                         break
+            
             if not ffmpeg_binary:
-                ffmpeg_binary = 'ffmpeg'  # Last resort - hope it's in PATH
-            logger.info(f"🎵 [ENSURE MUSIC] Using FFmpeg binary: {ffmpeg_binary}")
+                logger.error("❌ [ENSURE MUSIC] FFmpeg not found anywhere!")
+                return video_path
             
             output_with_music = video_path.replace(".mp4", "_with_music.mp4")
             cmd = [
