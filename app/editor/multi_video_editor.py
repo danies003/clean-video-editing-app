@@ -1631,19 +1631,10 @@ class MultiVideoEditor:
                 logger.warning("⚠️ [GEMINI PARSE] No story_concept in JSON response")
                 
         except Exception as e:
-            logger.warning(f"⚠️ [GEMINI PARSE] Failed to parse JSON: {e}")
-            logger.info("⚠️ [GEMINI PARSE] Falling back to generic captions")
-            story_concept = None  # No generic placeholder
-            
-            # Fallback: create basic story moments
-            for i in range(min(7, num_videos * 2)):
-                story_moments.append({
-                    "video_index": i % num_videos,
-                    "start_time": 0.0,
-                    "duration": 2.0,
-                    "caption": f"Highlight moment from video {i % num_videos + 1}",
-                    "suggested_effects": "color_boost, cinematic"
-                })
+            logger.error(f"❌ [GEMINI PARSE] Failed to parse JSON: {e}")
+            logger.error(f"❌ [GEMINI PARSE] Response text: {response_text}")
+            # Don't use fallback - let it fail so we know there's a problem
+            raise Exception(f"Failed to parse Gemini response: {e}")
         
         return {
             "story_concept": story_concept,

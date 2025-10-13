@@ -1278,17 +1278,23 @@ export default function Home() {
                   }}
                   onProceed={() => {
                     // Handle final proceed action - download the video
-                    if (outputVideoUrl) {
-                      // Create a download link for the final video
+                    if (currentProjectId) {
+                      // Use the backend download endpoint instead of S3 URL
+                      const downloadUrl = `${
+                        process.env.NEXT_PUBLIC_API_URL?.replace(
+                          "/api/v1",
+                          ""
+                        ) || "http://localhost:8000"
+                      }/api/v1/multi-video/projects/${currentProjectId}/download`;
+
                       const a = document.createElement("a");
-                      a.href = outputVideoUrl;
+                      a.href = downloadUrl;
                       a.download = "multi-video-edited.mp4";
-                      a.target = "_blank";
                       document.body.appendChild(a);
                       a.click();
                       document.body.removeChild(a);
                     } else {
-                      console.log("No output video URL available for download");
+                      console.log("No project ID available for download");
                     }
                   }}
                 />
