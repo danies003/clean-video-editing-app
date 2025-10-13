@@ -357,6 +357,15 @@ class MultiVideoEditor:
                 output_path=str(output_path)
             )
             logger.info(f"🎬 [INTELLIGENT] _create_full_intelligent_video completed: {result}")
+            
+            # FORCE: Add music as post-processing step to ensure it's always there
+            logger.info("🎵 [POST-PROCESS] FORCING music addition as final step...")
+            try:
+                result = await self._ensure_music_on_video(result, project_id)
+                logger.info(f"✅ [POST-PROCESS] Music addition complete: {result}")
+            except Exception as music_e:
+                logger.error(f"❌ [POST-PROCESS] Failed to add music in post-process: {music_e}")
+            
             return result
         except Exception as e:
             logger.error(f"❌ [INTELLIGENT] _create_full_intelligent_video failed: {e}")
@@ -364,7 +373,81 @@ class MultiVideoEditor:
             logger.error(f"❌ [INTELLIGENT] Error details: {str(e)}")
             # Fallback to simple concatenation
             logger.info("🔄 [INTELLIGENT] Falling back to simple concatenation")
-            return await self._create_simple_concatenation_fallback(video_paths, project_id, str(output_path))
+            fallback_result = await self._create_simple_concatenation_fallback(video_paths, project_id, str(output_path))
+            
+            # FORCE: Add music to fallback video too
+            logger.info("🎵 [POST-PROCESS FALLBACK] FORCING music addition to fallback video...")
+            try:
+                fallback_result = await self._ensure_music_on_video(fallback_result, project_id)
+                logger.info(f"✅ [POST-PROCESS FALLBACK] Music addition complete: {fallback_result}")
+            except Exception as music_e:
+                logger.error(f"❌ [POST-PROCESS FALLBACK] Failed to add music: {music_e}")
+            
+            return fallback_result
+    
+    async def _ensure_music_on_video(self, video_path: str, project_id: str) -> str:
+        """
+        Post-processing step to ensure music is added to any video.
+        Uses FFmpeg to add music track if video doesn't have it or to replace audio.
+        """
+        logger.info(f"🎵 [ENSURE MUSIC] Adding music to video: {video_path}")
+        
+        try:
+            import random
+            from pathlib import Path
+            
+            # Select music
+            music_files = [
+                "app/assets/music/Test/Only me - Patrick Patrikios.mp3",
+                "app/assets/music/Test/Neon nights - Patrick Patrikios.mp3",
+                "app/assets/music/Test/Forever ever - Patrick Patrikios.mp3"
+            ]
+            selected_audio_path = random.choice(music_files)
+            logger.info(f"🎵 [ENSURE MUSIC] Selected: {selected_audio_path}")
+            
+            # Download from S3 if needed
+            selected_audio = selected_audio_path
+            if not Path(selected_audio_path).exists():
+                logger.info(f"🎵 [ENSURE MUSIC] Downloading from S3...")
+                from app.services import get_service_manager
+                storage_client = await get_service_manager().get_storage()
+                music_cache_dir = Path("/tmp/music_cache")
+                music_cache_dir.mkdir(exist_ok=True)
+                s3_key = selected_audio_path.replace("app/assets/", "assets/")
+                local_music_path = music_cache_dir / Path(selected_audio_path).name
+                storage_client.s3_client.download_file(storage_client.bucket_name, s3_key, str(local_music_path))
+                selected_audio = str(local_music_path)
+                logger.info(f"✅ [ENSURE MUSIC] Downloaded to: {selected_audio}")
+            
+            if not Path(selected_audio).exists():
+                logger.warning(f"⚠️ [ENSURE MUSIC] Music file not found, skipping")
+                return video_path
+            
+            # Use FFmpeg to add music
+            output_with_music = video_path.replace(".mp4", "_with_music.mp4")
+            cmd = [
+                'ffmpeg', '-i', video_path, '-i', selected_audio,
+                '-filter_complex', '[1:a]volume=0.3[music];[0:a][music]amix=inputs=2:duration=shortest[aout]',
+                '-map', '0:v', '-map', '[aout]',
+                '-c:v', 'copy', '-c:a', 'aac',
+                '-shortest', '-y', output_with_music
+            ]
+            
+            logger.info(f"🎵 [ENSURE MUSIC] Running FFmpeg to mix music...")
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            
+            if result.returncode == 0 and os.path.exists(output_with_music):
+                logger.info(f"✅ [ENSURE MUSIC] Music added successfully")
+                # Replace original with music version
+                os.replace(output_with_music, video_path)
+                return video_path
+            else:
+                logger.error(f"❌ [ENSURE MUSIC] FFmpeg failed: {result.stderr[:200]}")
+                return video_path
+                
+        except Exception as e:
+            logger.error(f"❌ [ENSURE MUSIC] Error: {e}")
+            return video_path
     
     async def _create_simple_fallback_video(
         self, 
