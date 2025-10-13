@@ -1592,7 +1592,7 @@ class MultiVideoEditor:
         logger.info(f"📝 [GEMINI PARSE] First 500 chars: {response_text[:500]}")
         
         story_moments = []
-        story_concept = "A dynamic showcase of video highlights"
+        story_concept = None  # Will be extracted from Gemini's response
         
         try:
             # Try to parse JSON response from Gemini
@@ -1626,10 +1626,14 @@ class MultiVideoEditor:
             
             if 'story_concept' in data:
                 story_concept = data['story_concept']
+                logger.info(f"📝 [GEMINI PARSE] Story concept: {story_concept}")
+            else:
+                logger.warning("⚠️ [GEMINI PARSE] No story_concept in JSON response")
                 
         except Exception as e:
             logger.warning(f"⚠️ [GEMINI PARSE] Failed to parse JSON: {e}")
             logger.info("⚠️ [GEMINI PARSE] Falling back to generic captions")
+            story_concept = None  # No generic placeholder
             
             # Fallback: create basic story moments
             for i in range(min(7, num_videos * 2)):
