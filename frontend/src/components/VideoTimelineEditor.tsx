@@ -2366,10 +2366,8 @@ const VideoTimelineEditor: React.FC<VideoTimelineEditorProps> = ({
                             result =
                               await apiClient.downloadMultiVideoWithCustomEffects(
                                 projectId,
-                                {
-                                  segments: segments,
-                                  quality_preset: "high"
-                                }
+                                segments,
+                                "high"
                               );
                           } else {
                             // Single video - extract video ID from convertedVideoUrl
