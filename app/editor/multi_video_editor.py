@@ -424,9 +424,17 @@ class MultiVideoEditor:
                 return video_path
             
             # Use FFmpeg to add music
-            # Get FFmpeg binary path (same as MoviePy uses)
+            # Get FFmpeg binary path - use shutil.which first (most reliable)
             import shutil
-            ffmpeg_binary = os.environ.get('FFMPEG_BINARY') or shutil.which('ffmpeg') or 'ffmpeg'
+            ffmpeg_binary = shutil.which('ffmpeg')
+            if not ffmpeg_binary:
+                # Fallback to common locations
+                for path in ['/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg', '/opt/homebrew/bin/ffmpeg']:
+                    if os.path.exists(path):
+                        ffmpeg_binary = path
+                        break
+            if not ffmpeg_binary:
+                ffmpeg_binary = 'ffmpeg'  # Last resort - hope it's in PATH
             logger.info(f"🎵 [ENSURE MUSIC] Using FFmpeg binary: {ffmpeg_binary}")
             
             output_with_music = video_path.replace(".mp4", "_with_music.mp4")
