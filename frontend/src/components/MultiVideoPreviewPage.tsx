@@ -263,10 +263,12 @@ const MultiVideoPreviewPage: React.FC<MultiVideoPreviewPageProps> = ({
         <VideoTimelineEditor
           videoFile={undefined} // Remove empty file - let component handle video loading
           convertedVideoUrl={
-            timelineSegments[0]?.stream_url
-              ? `${process.env.NEXT_PUBLIC_API_URL}${timelineSegments[0].stream_url}`
+            projectId
+              ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1/multi-video/projects/${projectId}/download`
+              : timelineSegments[0]?.stream_url
+              ? timelineSegments[0].stream_url
               : timelineSegments[0]?.video_url
-              ? `${process.env.NEXT_PUBLIC_API_URL}${timelineSegments[0].video_url}`
+              ? timelineSegments[0].video_url
               : sourceVideos[0]?.url
           }
           segments={convertedSegments}

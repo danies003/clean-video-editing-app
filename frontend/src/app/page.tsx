@@ -854,57 +854,49 @@ export default function Home() {
                     status.output_video_url
                   );
 
-                  // Use the first timeline segment's stream URL instead of direct S3 URL
-                  const firstSegment = timelineResponse.segments?.[0];
-                  if (firstSegment?.stream_url) {
-                    const proxyVideoUrl = `http://localhost:8000${firstSegment.stream_url}`;
-                    console.log("🎬 Using proxy video URL:", proxyVideoUrl);
+                  // Use the backend download endpoint instead of direct S3 URL
+                  const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/multi-video/projects/${currentProjectId}/download`;
+                  console.log("🎬 Using backend download URL:", downloadUrl);
 
-                    // Fetch the processed video from the proxy endpoint
-                    try {
-                      const videoResponse = await fetch(proxyVideoUrl);
-                      const videoBlob = await videoResponse.blob();
-                      const videoFile = new File(
-                        [videoBlob],
-                        "processed_multi_video.mp4",
-                        { type: "video/mp4" }
-                      );
-
-                      setVideoFile(videoFile);
-                      setUploadedVideo({
-                        success: true,
-                        message: "Video uploaded successfully",
-                        timestamp: new Date().toISOString(),
-                        video_id: "multi_video_combined",
-                        upload_url: URL.createObjectURL(videoFile),
-                        expires_at: new Date(
-                          Date.now() + 3600000
-                        ).toISOString(), // 1 hour expiration
-                        metadata: {
-                          filename: "processed_multi_video.mp4",
-                          size: videoBlob.size,
-                          content_type: "video/mp4",
-                          duration: 10.0, // Placeholder duration
-                        },
-                      });
-
-                      console.log(
-                        "✅ Set processed video file for preview using proxy URL"
-                      );
-                    } catch (error) {
-                      console.error(
-                        "❌ Failed to fetch processed video from proxy:",
-                        error
-                      );
-                      throw new Error(
-                        "Failed to fetch processed video from backend proxy"
-                      );
-                    }
-                  } else {
-                    console.error(
-                      "❌ No stream URL found in timeline segments"
+                  // Fetch the processed video from the backend download endpoint
+                  try {
+                    const videoResponse = await fetch(downloadUrl);
+                    const videoBlob = await videoResponse.blob();
+                    const videoFile = new File(
+                      [videoBlob],
+                      "processed_multi_video.mp4",
+                      { type: "video/mp4" }
                     );
-                    throw new Error("No stream URL provided by backend");
+
+                    setVideoFile(videoFile);
+                    setUploadedVideo({
+                      success: true,
+                      message: "Video uploaded successfully",
+                      timestamp: new Date().toISOString(),
+                      video_id: "multi_video_combined",
+                      upload_url: URL.createObjectURL(videoFile),
+                      expires_at: new Date(
+                        Date.now() + 3600000
+                      ).toISOString(), // 1 hour expiration
+                      metadata: {
+                        filename: "processed_multi_video.mp4",
+                        size: videoBlob.size,
+                        content_type: "video/mp4",
+                        duration: 10.0, // Placeholder duration
+                      },
+                    });
+
+                    console.log(
+                      "✅ Set processed video file for preview using backend download URL"
+                    );
+                  } catch (error) {
+                    console.error(
+                      "❌ Failed to fetch processed video from backend:",
+                      error
+                    );
+                    throw new Error(
+                      "Failed to fetch processed video from backend"
+                    );
                   }
                 } else {
                   console.error("❌ No output video URL found");

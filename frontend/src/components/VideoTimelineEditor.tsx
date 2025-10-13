@@ -2362,7 +2362,10 @@ const VideoTimelineEditor: React.FC<VideoTimelineEditorProps> = ({
                           // Check if this is a multi-video project
                           if (projectId) {
                             // Multi-video project - use project ID
-                            console.log("🎬 Rendering multi-video project:", projectId);
+                            console.log(
+                              "🎬 Rendering multi-video project:",
+                              projectId
+                            );
                             result =
                               await apiClient.downloadMultiVideoWithCustomEffects(
                                 projectId,
@@ -2375,7 +2378,10 @@ const VideoTimelineEditor: React.FC<VideoTimelineEditorProps> = ({
                               convertedVideoUrl?.match(/\/videos\/([^\/]+)\//);
                             if (videoIdMatch) {
                               const videoId = videoIdMatch[1];
-                              console.log("🎬 Rendering single video:", videoId);
+                              console.log(
+                                "🎬 Rendering single video:",
+                                videoId
+                              );
                               result =
                                 await apiClient.downloadVideoWithCustomEffects(
                                   videoId,
