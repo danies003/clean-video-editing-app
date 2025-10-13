@@ -264,9 +264,9 @@ const MultiVideoPreviewPage: React.FC<MultiVideoPreviewPageProps> = ({
           videoFile={undefined} // Remove empty file - let component handle video loading
           convertedVideoUrl={
             timelineSegments[0]?.stream_url
-              ? `http://localhost:8000${timelineSegments[0].stream_url}`
+              ? `${process.env.NEXT_PUBLIC_API_URL}${timelineSegments[0].stream_url}`
               : timelineSegments[0]?.video_url
-              ? `http://localhost:8000${timelineSegments[0].video_url}`
+              ? `${process.env.NEXT_PUBLIC_API_URL}${timelineSegments[0].video_url}`
               : sourceVideos[0]?.url
           }
           segments={convertedSegments}

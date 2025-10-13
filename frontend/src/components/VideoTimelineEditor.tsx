@@ -2359,22 +2359,36 @@ const VideoTimelineEditor: React.FC<VideoTimelineEditorProps> = ({
                               "high" // quality preset
                             );
                         } else {
-                          // Single video - extract video ID from convertedVideoUrl
-                          const videoIdMatch =
-                            convertedVideoUrl?.match(/\/videos\/([^\/]+)\//);
-                          if (videoIdMatch) {
-                            const videoId = videoIdMatch[1];
-                            console.log("🎬 Rendering single video:", videoId);
+                          // Check if this is a multi-video project
+                          if (projectId) {
+                            // Multi-video project - use project ID
+                            console.log("🎬 Rendering multi-video project:", projectId);
                             result =
-                              await apiClient.downloadVideoWithCustomEffects(
-                                videoId,
-                                segments,
-                                "high" // quality preset
+                              await apiClient.downloadMultiVideoWithCustomEffects(
+                                projectId,
+                                {
+                                  segments: segments,
+                                  quality_preset: "high"
+                                }
                               );
                           } else {
-                            throw new Error(
-                              "Could not extract video ID from URL"
-                            );
+                            // Single video - extract video ID from convertedVideoUrl
+                            const videoIdMatch =
+                              convertedVideoUrl?.match(/\/videos\/([^\/]+)\//);
+                            if (videoIdMatch) {
+                              const videoId = videoIdMatch[1];
+                              console.log("🎬 Rendering single video:", videoId);
+                              result =
+                                await apiClient.downloadVideoWithCustomEffects(
+                                  videoId,
+                                  segments,
+                                  "high" // quality preset
+                                );
+                            } else {
+                              throw new Error(
+                                "Could not extract video ID from URL"
+                              );
+                            }
                           }
                         }
 
