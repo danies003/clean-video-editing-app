@@ -424,9 +424,14 @@ class MultiVideoEditor:
                 return video_path
             
             # Use FFmpeg to add music
+            # Get FFmpeg binary path (same as MoviePy uses)
+            import shutil
+            ffmpeg_binary = os.environ.get('FFMPEG_BINARY') or shutil.which('ffmpeg') or 'ffmpeg'
+            logger.info(f"🎵 [ENSURE MUSIC] Using FFmpeg binary: {ffmpeg_binary}")
+            
             output_with_music = video_path.replace(".mp4", "_with_music.mp4")
             cmd = [
-                'ffmpeg', '-i', video_path, '-i', selected_audio,
+                ffmpeg_binary, '-i', video_path, '-i', selected_audio,
                 '-filter_complex', '[1:a]volume=0.3[music];[0:a][music]amix=inputs=2:duration=shortest[aout]',
                 '-map', '0:v', '-map', '[aout]',
                 '-c:v', 'copy', '-c:a', 'aac',

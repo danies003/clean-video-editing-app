@@ -37,7 +37,9 @@ function AuthCallbackContent() {
         try {
           // Use HTTPS for OAuth completion (required by Facebook)
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/auth/social`,
+            `${
+              process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+            }/api/v1/auth/social`,
             {
               method: "POST",
               headers: {
@@ -52,11 +54,16 @@ function AuthCallbackContent() {
           );
 
           if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
+            const errorData = await response
+              .json()
+              .catch(() => ({ detail: "Unknown error" }));
             console.error("Authentication error:", errorData);
-            
+
             // Handle specific Facebook OAuth errors
-            if (errorData.detail && errorData.detail.includes("authorization code has been used")) {
+            if (
+              errorData.detail &&
+              errorData.detail.includes("authorization code has been used")
+            ) {
               setStatus("error");
               setMessage("Authentication already completed. Redirecting...");
               setTimeout(() => {
@@ -64,7 +71,7 @@ function AuthCallbackContent() {
               }, 2000);
               return;
             }
-            
+
             throw new Error(errorData.detail || "Authentication failed");
           }
           const authData = await response.json();
@@ -94,7 +101,11 @@ function AuthCallbackContent() {
         } catch (error) {
           console.error("Authentication error:", error);
           setStatus("error");
-          setMessage(error instanceof Error ? error.message : "Authentication failed. Please try again.");
+          setMessage(
+            error instanceof Error
+              ? error.message
+              : "Authentication failed. Please try again."
+          );
           setTimeout(() => {
             router.push("/");
           }, 3000);
