@@ -875,9 +875,7 @@ export default function Home() {
                       timestamp: new Date().toISOString(),
                       video_id: "multi_video_combined",
                       upload_url: URL.createObjectURL(videoFile),
-                      expires_at: new Date(
-                        Date.now() + 3600000
-                      ).toISOString(), // 1 hour expiration
+                      expires_at: new Date(Date.now() + 3600000).toISOString(), // 1 hour expiration
                       metadata: {
                         filename: "processed_multi_video.mp4",
                         size: videoBlob.size,
@@ -1337,6 +1335,7 @@ export default function Home() {
                   sourceVideos={sourceVideos}
                   timelineSegments={timelineSegments}
                   outputVideoUrl={outputVideoUrl}
+                  projectId={currentProjectId || undefined}
                   onUpdateSegment={(segmentIndex: number, updates: any) => {
                     // Update the timeline segments
                     const updatedSegments = [...timelineSegments];
