@@ -1038,12 +1038,17 @@ export default function Home() {
   console.log("🔧 [DEBUG] isMultiVideo:", isMultiVideo);
   console.log("🔧 [DEBUG] timelineSegments length:", timelineSegments.length);
   console.log("🔧 [DEBUG] timelineSegments:", timelineSegments);
+  console.log("🔧 [DEBUG] currentProjectId:", currentProjectId);
+  console.log("🔧 [DEBUG] appState:", appState);
   if (timelineSegments.length > 0) {
     console.log(
       "🔧 [DEBUG] Unique source_video_ids:",
       new Set(timelineSegments.map((s: any) => s.source_video_id))
     );
   }
+
+  // Modified condition to ensure currentProjectId is available before showing MultiVideoPreviewPage
+  const shouldShowMultiVideoPreview = isMultiVideo && currentProjectId;
 
   return (
     <main>
@@ -1244,7 +1249,7 @@ export default function Home() {
               </motion.div>
             )}
 
-            {isMultiVideo ? (
+            {shouldShowMultiVideoPreview ? (
               <div className="min-h-screen">
                 <MultiVideoPreviewPage
                   sourceVideos={sourceVideos}
