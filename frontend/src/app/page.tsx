@@ -1335,7 +1335,11 @@ export default function Home() {
                   sourceVideos={sourceVideos}
                   timelineSegments={timelineSegments}
                   outputVideoUrl={outputVideoUrl}
-                  projectId={currentProjectId || undefined}
+                  projectId={(() => {
+                    console.log("🎬 [page.tsx] currentProjectId:", currentProjectId);
+                    console.log("🎬 [page.tsx] projectId being passed:", currentProjectId || undefined);
+                    return currentProjectId || undefined;
+                  })()}
                   onUpdateSegment={(segmentIndex: number, updates: any) => {
                     // Update the timeline segments
                     const updatedSegments = [...timelineSegments];

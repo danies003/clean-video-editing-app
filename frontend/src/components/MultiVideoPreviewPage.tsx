@@ -264,12 +264,21 @@ const MultiVideoPreviewPage: React.FC<MultiVideoPreviewPageProps> = ({
           videoFile={undefined} // Remove empty file - let component handle video loading
           convertedVideoUrl={
             projectId
-              ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1/multi-video/projects/${projectId}/download`
-              : timelineSegments[0]?.stream_url
-              ? timelineSegments[0].stream_url
-              : timelineSegments[0]?.video_url
-              ? timelineSegments[0].video_url
-              : sourceVideos[0]?.url
+              ? (() => {
+                  console.log("🎬 [MultiVideoPreviewPage] Using projectId for download URL:", projectId);
+                  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/multi-video/projects/${projectId}/download`;
+                  console.log("🎬 [MultiVideoPreviewPage] Generated download URL:", url);
+                  return url;
+                })()
+              : (() => {
+                  console.log("🎬 [MultiVideoPreviewPage] No projectId, falling back to timeline segments");
+                  console.log("🎬 [MultiVideoPreviewPage] Timeline segments:", timelineSegments);
+                  return timelineSegments[0]?.stream_url
+                    ? timelineSegments[0].stream_url
+                    : timelineSegments[0]?.video_url
+                    ? timelineSegments[0].video_url
+                    : sourceVideos[0]?.url;
+                })()
           }
           segments={convertedSegments}
           onSegmentUpdate={handleSegmentUpdate}
