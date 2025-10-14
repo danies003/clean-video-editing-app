@@ -1250,6 +1250,7 @@ export default function Home() {
                   sourceVideos={sourceVideos}
                   timelineSegments={timelineSegments}
                   outputVideoUrl={outputVideoUrl}
+                  projectId={currentProjectId || undefined}
                   llmSuggestions={llmSuggestions}
                   onUpdateSegment={(segmentIndex: number, updates: any) => {
                     // Update the timeline segments
@@ -1329,15 +1330,21 @@ export default function Home() {
                 />
               ))}
 
-            {appState === "completed" && !isMultiVideo && (
+            {appState === "completed" && isMultiVideo && (
               <div className="min-h-screen">
                 <MultiVideoPreviewPage
                   sourceVideos={sourceVideos}
                   timelineSegments={timelineSegments}
                   outputVideoUrl={outputVideoUrl}
                   projectId={(() => {
-                    console.log("🎬 [page.tsx] currentProjectId:", currentProjectId);
-                    console.log("🎬 [page.tsx] projectId being passed:", currentProjectId || undefined);
+                    console.log(
+                      "🎬 [page.tsx] currentProjectId:",
+                      currentProjectId
+                    );
+                    console.log(
+                      "🎬 [page.tsx] projectId being passed:",
+                      currentProjectId || undefined
+                    );
                     return currentProjectId || undefined;
                   })()}
                   onUpdateSegment={(segmentIndex: number, updates: any) => {
